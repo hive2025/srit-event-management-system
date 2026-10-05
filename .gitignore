@@ -1,0 +1,35 @@
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# Environment variables and secrets
+.env
+.env.*
+
+# Google credentials and OAuth tokens
+client_secret.json
+credentials.json
+drive_token.json
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Local application data
+instance/
+
+# Uploaded/generated files
+uploads/
+test_sop_outputs/
+
+# VS Code settings
+.vscode/
+
+# Node dependencies
+node_modules/
+
+# Build files
+dist/
+build/

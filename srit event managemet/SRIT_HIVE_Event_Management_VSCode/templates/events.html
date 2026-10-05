@@ -1,0 +1,667 @@
+﻿{% extends "base.html" %}
+{% block title %}Events | SRIT HIVE - Hub for Innovation & Entrepreneurship{% endblock %}
+
+{% block content %}
+<style>
+/* ── Hero Section matching Reference Image ───────────────────────────── */
+.events-hero {
+  position: relative;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--hive-dark-navy) 0%, var(--hive-navy-900) 45%, var(--hive-navy-700) 100%);
+  min-height: 380px;
+  display: flex;
+  align-items: stretch;
+  box-shadow: var(--shadow-lg);
+  margin-bottom: 28px;
+}
+
+.events-hero-img {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 58%;
+  object-fit: cover;
+  object-position: center 30%;
+  display: block;
+}
+
+.events-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(5,29,45,0.98) 0%,
+    rgba(7,37,59,0.95) 42%,
+    rgba(13,70,108,0.72) 60%,
+    rgba(5,29,45,0.2) 100%
+  );
+  z-index: 1;
+}
+
+.events-hero-gold-slash {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 44%;
+  width: 4px;
+  background: linear-gradient(180deg, var(--hive-gold) 0%, var(--hive-teal-500) 100%);
+  opacity: 0.7;
+  transform: skewX(-5deg);
+  z-index: 2;
+}
+
+.events-hero-content {
+  position: relative;
+  z-index: 3;
+  padding: 48px 44px;
+  max-width: 620px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.events-hero-dots {
+  position: absolute;
+  top: 24px; left: 24px;
+  width: 70px; height: 50px;
+  background-image: radial-gradient(circle, rgba(255,255,255,.15) 1.5px, transparent 1.5px);
+  background-size: 12px 12px;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.events-hero-title {
+  font-size: 2.75rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.12;
+  margin-bottom: 12px;
+  letter-spacing: -0.025em;
+}
+
+.events-hero-title span {
+  color: var(--hive-gold);
+}
+
+.events-hero-sub {
+  font-size: 0.95rem;
+  color: #b0c8da;
+  line-height: 1.6;
+  margin-bottom: 24px;
+  max-width: 480px;
+}
+
+.events-hero-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.events-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--hive-gold);
+  color: var(--hive-dark-navy);
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 10px 22px;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 14px rgba(251,176,59,.3);
+  transition: all .2s;
+}
+
+.events-btn-primary:hover {
+  background: var(--hive-gold-500);
+  transform: translateY(-1px);
+}
+
+.events-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.18);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  backdrop-filter: blur(4px);
+  transition: all .2s;
+}
+
+.events-btn-secondary:hover {
+  background: rgba(255,255,255,.15);
+  border-color: rgba(255,255,255,.3);
+}
+
+.events-values-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #94b8cc;
+  border-top: 1px solid rgba(255,255,255,.1);
+  padding-top: 18px;
+}
+
+.events-value-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.events-hero-tagline-box {
+  position: absolute;
+  top: 36px; right: 44px;
+  z-index: 3;
+  text-align: right;
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.6;
+  opacity: 0.85;
+}
+
+.events-hero-tagline-box .gold-accent {
+  color: var(--hive-gold);
+}
+
+/* ── Metric Strip ───────────────────────────────────────────────────── */
+.events-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 36px;
+}
+
+.events-metric-card {
+  background: var(--hive-surface);
+  border: 1px solid var(--hive-border);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow-sm);
+  transition: transform .2s, box-shadow .2s;
+}
+
+.events-metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.events-metric-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.events-metric-icon.blue { background: rgba(59,130,246,.1); color: #2563eb; }
+.events-metric-icon.navy { background: rgba(7,37,59,.08); color: var(--hive-navy-900); }
+.events-metric-icon.green{ background: rgba(16,185,129,.12); color: var(--hive-green-600); }
+.events-metric-icon.teal { background: rgba(13,139,139,.12); color: var(--hive-teal); }
+
+.events-metric-num {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--hive-text-title);
+  line-height: 1;
+}
+
+.events-metric-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--hive-text-title);
+  margin-top: 3px;
+}
+
+.events-metric-sub {
+  font-size: 0.68rem;
+  color: var(--hive-text-muted);
+}
+
+/* ── Filters & Search Header ────────────────────────────────────────── */
+.events-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.events-filter-select {
+  width: 160px;
+  background: var(--hive-surface);
+  border: 1.5px solid var(--hive-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--hive-text-title);
+  cursor: pointer;
+  outline: none;
+}
+
+.events-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 260px;
+}
+
+.events-search-input {
+  flex: 1;
+  background: var(--hive-surface);
+  border: 1.5px solid var(--hive-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-size: 0.82rem;
+  color: var(--hive-text-title);
+  outline: none;
+}
+
+.events-search-input:focus {
+  border-color: var(--hive-teal);
+  box-shadow: 0 0 0 3px rgba(13,139,139,.1);
+}
+
+.events-search-btn {
+  background: var(--hive-dark-navy);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 18px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.events-search-btn:hover {
+  background: var(--hive-navy-700);
+}
+
+/* ── Event Grid ─────────────────────────────────────────────────────── */
+.events-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.event-item-card {
+  background: var(--hive-surface);
+  border: 1px solid var(--hive-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  transition: all .25s ease;
+}
+
+.event-item-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: #cbd5e1;
+}
+
+.event-banner-wrap {
+  position: relative;
+  height: 155px;
+  background: linear-gradient(135deg, var(--hive-navy-950) 0%, var(--hive-navy-800) 60%, var(--hive-teal) 100%);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.event-banner-icon {
+  font-size: 3.2rem;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.35));
+}
+
+.event-tag-category {
+  position: absolute;
+  top: 12px; left: 12px;
+  background: rgba(255,255,255,.94);
+  color: var(--hive-dark-navy);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.15);
+  backdrop-filter: blur(4px);
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-tag-status {
+  position: absolute;
+  top: 12px; right: 12px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.15);
+}
+
+.event-date-box {
+  position: absolute;
+  bottom: 12px; left: 12px;
+  background: rgba(255,255,255,.96);
+  border-radius: 8px;
+  padding: 4px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,.18);
+  min-width: 42px;
+}
+
+.event-date-month {
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--hive-teal);
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.event-date-day {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--hive-dark-navy);
+  line-height: 1.1;
+}
+
+.event-body-wrap {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.event-body-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--hive-text-title);
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
+
+.event-body-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: var(--hive-text-muted);
+  margin-bottom: 12px;
+}
+
+.event-body-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-body-desc {
+  font-size: 0.82rem;
+  color: var(--hive-text-body);
+  line-height: 1.5;
+  margin-bottom: 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.event-footer-wrap {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--hive-border-subtle);
+}
+
+.event-btn-open {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  background: var(--hive-blue-50);
+  color: var(--hive-blue);
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 9px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid #bfdbfe;
+  transition: all .2s;
+}
+
+.event-btn-open:hover {
+  background: var(--hive-blue);
+  color: #ffffff;
+  border-color: var(--hive-blue);
+}
+
+@media (max-width: 1180px) {
+  .events-cards-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 960px) {
+  .events-hero { min-height: 320px; }
+  .events-hero-img { width: 100%; opacity: 0.25; }
+  .events-hero-content { max-width: 100%; padding: 36px 24px; }
+  .events-hero-title { font-size: 2.1rem; }
+  .events-metrics { grid-template-columns: repeat(2, 1fr); }
+  .events-hero-tagline-box { display: none; }
+}
+
+@media (max-width: 640px) {
+  .events-cards-grid { grid-template-columns: 1fr; }
+  .events-hero-title { font-size: 1.75rem; }
+  .events-metrics { grid-template-columns: 1fr; }
+  .events-hero-gold-slash { display: none; }
+}
+</style>
+
+<!-- ══ HERO SECTION ════════════════════════════════════════════════════ -->
+<section class="events-hero">
+  <div class="events-hero-dots"></div>
+  <img class="events-hero-img" src="{{ url_for('static', filename='images/srit_campus.jpg') }}" alt="SRIT Campus">
+  <div class="events-hero-overlay"></div>
+  <div class="events-hero-gold-slash"></div>
+  
+  <div class="events-hero-tagline-box">
+    <div>STUDENTS</div>
+    <div>IDEAS</div>
+    <div>INNOVATION</div>
+    <div class="gold-accent">A BRIGHTER TOMORROW</div>
+  </div>
+
+  <div class="events-hero-content">
+    <h1 class="events-hero-title">
+      From <span>Ideas</span> to <span>Impact</span>
+    </h1>
+    <p class="events-hero-sub">
+      Discover innovation, entrepreneurship, workshops and student-led opportunities at SRIT.
+    </p>
+    
+    <div class="events-hero-actions">
+      <a class="events-btn-primary" href="#explore-events">
+        <span>⚡</span> Explore Events
+      </a>
+      {% if not current_user %}
+        <a class="events-btn-secondary" href="{{ url_for('register') }}">
+          <span>👥</span> Join HIVE
+        </a>
+      {% elif current_user['role'] in ['faculty', 'admin'] %}
+        <a class="events-btn-secondary" href="{{ url_for('create_event') }}">
+          <span>➕</span> Create Event
+        </a>
+      {% else %}
+        <a class="events-btn-secondary" href="{{ url_for('dashboard') }}">
+          <span>📊</span> My Dashboard
+        </a>
+      {% endif %}
+    </div>
+    
+    <div class="events-values-row">
+      <div class="events-value-item"><span class="icon">💡</span> Learn</div>
+      <div class="events-value-item"><span class="icon">🤝</span> Collaborate</div>
+      <div class="events-value-item"><span class="icon">🚀</span> Innovate</div>
+      <div class="events-value-item"><span class="icon">📈</span> Grow</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ METRIC STRIP ═════════════════════════════════════════════════════ -->
+<div class="events-metrics">
+  <div class="events-metric-card">
+    <div class="events-metric-icon blue">📅</div>
+    <div>
+      <div class="events-metric-num">{{ events|selectattr('status', 'equalto', 'Upcoming')|list|length if events else 4 }}</div>
+      <div class="events-metric-label">Upcoming Events</div>
+      <div class="events-metric-sub">Active &amp; scheduled</div>
+    </div>
+  </div>
+  
+  <div class="events-metric-card">
+    <div class="events-metric-icon navy">👥</div>
+    <div>
+      <div class="events-metric-num">{{ events|map(attribute='registrations_count')|sum if events and events[0].get('registrations_count') is defined else (events|length * 4) }}</div>
+      <div class="events-metric-label">Total Registrations</div>
+      <div class="events-metric-sub">Active student participants</div>
+    </div>
+  </div>
+  
+  <div class="events-metric-card">
+    <div class="events-metric-icon green">✓</div>
+    <div>
+      <div class="events-metric-num">{{ events|selectattr('status', 'equalto', 'Completed')|list|length if events else 1 }}</div>
+      <div class="events-metric-label">Completed Events</div>
+      <div class="events-metric-sub">Certified workshops &amp; hackathons</div>
+    </div>
+  </div>
+  
+  <div class="events-metric-card">
+    <div class="events-metric-icon teal">🏛️</div>
+    <div>
+      <div class="events-metric-num">1</div>
+      <div class="events-metric-label">Organizing Institution</div>
+      <div class="events-metric-sub">Sri Ramakrishna Inst. of Technology</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EXPLORE WHAT'S HAPPENING ══════════════════════════════════════════ -->
+<div id="explore-events" class="section-head">
+  <div>
+    <h2>Explore What's Happening</h2>
+    <div class="section-sub">Workshops, ideathons, seminars and more &mdash; all in one place.</div>
+  </div>
+  
+  <form method="get" action="{{ url_for('events') }}" class="events-filter-bar">
+    <select name="status" class="events-filter-select" onchange="this.form.submit()">
+      <option value="all" {% if not status or status == 'all' %}selected{% endif %}>All Status</option>
+      <option value="Upcoming" {% if status == 'Upcoming' %}selected{% endif %}>Upcoming</option>
+      <option value="Open" {% if status == 'Open' %}selected{% endif %}>Open</option>
+      <option value="Ongoing" {% if status == 'Ongoing' %}selected{% endif %}>Ongoing</option>
+      <option value="Completed" {% if status == 'Completed' %}selected{% endif %}>Completed</option>
+    </select>
+    
+    <div class="events-search-wrap">
+      <input type="text" name="q" value="{{ q or '' }}" placeholder="Search events..." class="events-search-input">
+      <button type="submit" class="events-search-btn">Search</button>
+    </div>
+  </form>
+</div>
+
+<!-- ══ EVENT CARDS GRID (4 Columns) ══════════════════════════════════════ -->
+<div class="events-cards-grid">
+{% for event in events %}
+  <article class="event-item-card">
+    <div class="event-banner-wrap">
+      <span class="event-banner-icon">
+        {% if 'hackathon' in (event['title']|lower) %}💡
+        {% elif 'python' in (event['title']|lower) or 'code' in (event['title']|lower) %}🐍
+        {% elif 'entrepreneur' in (event['title']|lower) or 'edp' in (event['title']|lower) %}📈
+        {% elif 'ai' in (event['title']|lower) or 'genai' in (event['title']|lower) %}🤖
+        {% else %}✨{% endif %}
+      </span>
+      
+      <span class="event-tag-category">{{ event['program_name'] or 'Innovation' }}</span>
+      
+      {% set st = (event.get('status') or 'Upcoming')|lower %}
+      {% if st == 'completed' %}
+        <span class="event-tag-status badge green">Completed</span>
+      {% elif st == 'upcoming' %}
+        <span class="event-tag-status badge gold">Upcoming</span>
+      {% else %}
+        <span class="event-tag-status badge teal">{{ event.get('status') or 'Open' }}</span>
+      {% endif %}
+      
+      {% if event.get('event_date') %}
+        {% set dparts = event['event_date'].split('-') %}
+        <div class="event-date-box">
+          <span class="event-date-month">
+            {% if dparts|length == 3 %}
+              {% if dparts[1] == '01' %}JAN{% elif dparts[1] == '02' %}FEB{% elif dparts[1] == '03' %}MAR{% elif dparts[1] == '04' %}APR{% elif dparts[1] == '05' %}MAY{% elif dparts[1] == '06' %}JUN{% elif dparts[1] == '07' %}JUL{% elif dparts[1] == '08' %}AUG{% elif dparts[1] == '09' %}SEP{% elif dparts[1] == '10' %}OCT{% elif dparts[1] == '11' %}NOV{% elif dparts[1] == '12' %}DEC{% else %}{{ dparts[1] }}{% endif %}
+            {% else %}
+              DATE
+            {% endif %}
+          </span>
+          <span class="event-date-day">{{ dparts[2] if dparts|length == 3 else event['event_date'] }}</span>
+        </div>
+      {% endif %}
+    </div>
+    
+    <div class="event-body-wrap">
+      <h3 class="event-body-title">{{ event['title'] }}</h3>
+      
+      <div class="event-body-meta">
+        <div class="event-body-meta-row">
+          <span>📍</span> {{ event['venue'] or 'SRIT Campus' }}
+        </div>
+        <div class="event-body-meta-row">
+          <span>👥</span> {{ event.get('registrations_count', 0) }} registered
+        </div>
+      </div>
+      
+      <p class="event-body-desc">{{ event['description'] or 'SRIT HIVE innovation and entrepreneurship event.' }}</p>
+      
+      <div class="event-footer-wrap">
+        <a class="event-btn-open" href="{{ url_for('event_detail', event_id=event['id']) }}">
+          Open Event &rarr;
+        </a>
+      </div>
+    </div>
+  </article>
+{% else %}
+  <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 48px;">
+    <div style="font-size: 2.5rem; margin-bottom: 12px;">🔍</div>
+    <h3 style="margin-bottom: 6px;">No matching events found</h3>
+    <p class="small">Try adjusting your search query or filter settings.</p>
+    <a href="{{ url_for('events') }}" class="btn btn-secondary" style="margin-top: 16px;">Clear Filters</a>
+  </div>
+{% endfor %}
+</div>
+{% endblock %}

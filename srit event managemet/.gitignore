@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+instance/*.db
+certificates/*.pdf
+static/uploads/*
+!static/uploads/.gitkeep
+*token*.json
+*credentials*.json
+*client_secret*.json
+credentials/
+drive_token.json

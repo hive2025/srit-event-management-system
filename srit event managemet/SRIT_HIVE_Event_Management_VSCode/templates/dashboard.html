@@ -1,0 +1,132 @@
+﻿{% extends "base.html" %}
+{% block title %}Dashboard | SRIT HIVE{% endblock %}
+
+{% block content %}
+<div class="section-head">
+  <div>
+    <h2>Welcome back, {{ current_user['name'] if current_user else 'User' }} 👋</h2>
+    <div class="section-sub">Role: <span class="badge teal">{{ (current_user['role'] if current_user else 'Student') | upper }}</span> &bull; Activity overview and registered events</div>
+  </div>
+  <div style="display:flex; gap: 8px;">
+    <a class="btn btn-secondary" href="{{ url_for('events') }}">Explore Events</a>
+    {% if current_user and current_user['role'] in ['faculty', 'admin'] %}
+      <a class="btn btn-primary" href="{{ url_for('create_event') }}">+ Create Event</a>
+    {% endif %}
+  </div>
+</div>
+
+{% if stats %}
+<div class="stats">
+  {% for k, v in stats.items() %}
+  <div class="stat">
+    <div style="font-size:1.6rem;">📊</div>
+    <div>
+      <div class="number">{{ v }}</div>
+      <div class="label">{{ k|replace('_', ' ')|title }}</div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if registrations %}
+<div class="section-head">
+  <div>
+    <h2>My Registered Events</h2>
+    <div class="section-sub">Track attendance and download certificates</div>
+  </div>
+</div>
+
+<div class="table-wrap" style="margin-bottom: 30px;">
+  <table>
+    <thead>
+      <tr>
+        <th>Event</th>
+        <th>Status</th>
+        <th>Attendance</th>
+        <th>Certificate</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in registrations %}
+      <tr>
+        <td>
+          <a href="{{ url_for('event_detail', event_id=r.get('event_id')) }}" style="font-weight:700; color:var(--hive-text-title);">
+            {{ r.get('title') or 'Event #' ~ r.get('event_id') }}
+          </a>
+          <div class="small">{{ r.get('event_date') }}</div>
+        </td>
+        <td>
+          <span class="badge gold">{{ r.get('status') or 'Registered' }}</span>
+        </td>
+        <td>
+          {% if r.get('attendance') or r.get('attendance_status') in ['present', 'attended'] %}
+            <span class="badge green">Present</span>
+          {% else %}
+            <span class="badge gold">Pending</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if r.get('certificate_file') %}
+            <a class="btn btn-success" href="{{ url_for('download_certificate', filename=r.get('certificate_file')) }}" style="padding: 5px 12px; font-size: 0.78rem;">
+              Download PDF &rarr;
+            </a>
+          {% else %}
+            <span class="small" style="color:var(--hive-text-muted)">Not generated</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="empty">You have not registered for any events yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% if events %}
+<div class="section-head">
+  <div>
+    <h2>HIVE Events Overview</h2>
+    <div class="section-sub">Explore campus initiatives and workshops</div>
+  </div>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Event</th>
+        <th>Date</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in events %}
+      <tr>
+        <td>
+          <div style="font-weight:700; color:var(--hive-text-title);">{{ e.get('title') }}</div>
+          <div class="small">{{ e.get('venue') }}</div>
+        </td>
+        <td style="font-size:0.8rem; color:var(--hive-text-muted);">{{ e.get('event_date') }}</td>
+        <td>
+          {% set st = (e.get('status') or 'Upcoming')|lower %}
+          {% if st == 'completed' %}<span class="badge green">Completed</span>
+          {% elif st == 'upcoming' %}<span class="badge gold">Upcoming</span>
+          {% else %}<span class="badge teal">{{ e.get('status') or 'Open' }}</span>{% endif %}
+        </td>
+        <td>
+          <a class="btn btn-secondary" href="{{ url_for('event_detail', event_id=e.get('id')) }}" style="padding: 5px 12px; font-size: 0.78rem;">
+            View &rarr;
+          </a>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="empty">No events found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

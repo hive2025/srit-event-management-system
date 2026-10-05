@@ -1,0 +1,2273 @@
+{% extends "base.html" %}
+{% block title %}Manage {{ event['title'] }} | SRIT HIVE{% endblock %}
+
+{% block content %}
+<style>
+  /* =========================================================
+     SRIT HIVE - Manage Event Workspace Design System
+     Matching Reference UI (media_1789726458986.png)
+     ========================================================= */
+  :root {
+    --hive-dark-navy: #051d2d;
+    --hive-navy-950: #031420;
+    --hive-navy-900: #07253b;
+    --hive-navy-800: #0a3350;
+    --hive-navy-700: #0d466c;
+    --hive-blue-600: #1d72b8;
+    --hive-teal-600: #0d8b8b;
+    --hive-teal-500: #14b8a6;
+    --hive-green-600: #0e8a5b;
+    --hive-green-500: #10b981;
+    --hive-gold-500: #f59e0b;
+    --hive-gold-400: #fbb03b;
+    --hive-gold-100: #fef3c7;
+    --hive-surface: #ffffff;
+    --hive-bg: #f4f7f9;
+    --hive-border: #e2e8f0;
+    --hive-border-subtle: #edf2f7;
+    --hive-text-title: #07253b;
+    --hive-text-body: #475569;
+    --hive-text-muted: #64748b;
+  }
+
+  .container {
+    max-width: 1240px !important;
+    padding: 0 20px 60px !important;
+  }
+
+  /* -------------------------------------------------------------
+     HERO BANNER (Matching Reference UI)
+     ------------------------------------------------------------- */
+  .hive-manage-hero {
+    margin-top: 14px;
+    margin-bottom: 22px;
+    border-radius: 20px;
+    background: linear-gradient(115deg, #031a2b 0%, #06314c 35%, #0a4f73 70%, #0d6385 100%);
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 16px 36px -10px rgba(5, 29, 45, 0.35);
+    min-height: 250px;
+    display: flex;
+    align-items: center;
+  }
+
+  .hive-manage-hero-building-bg {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 48%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.15) 15%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,1) 85%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.15) 15%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,1) 85%);
+  }
+  .hive-manage-hero-campus-img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: center 30%;
+    filter: contrast(1.06) brightness(0.92);
+  }
+  .hive-manage-hero-img-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, #031a2b 0%, rgba(3, 26, 43, 0.45) 30%, transparent 75%),
+                linear-gradient(to top, rgba(3, 26, 43, 0.45) 0%, transparent 40%);
+    pointer-events: none;
+  }
+
+  .hive-manage-hero-inner {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    padding: 32px 36px;
+    max-width: 720px;
+  }
+
+  .hive-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #94a3b8;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 12px;
+    transition: color 0.15s ease;
+  }
+  .hive-back-link:hover {
+    color: #ffffff;
+  }
+
+  .hive-manage-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #cbd5e1;
+    margin-bottom: 6px;
+  }
+  .hive-manage-eyebrow::after {
+    content: "";
+    display: inline-block;
+    width: 24px;
+    height: 2px;
+    background: var(--hive-gold-400);
+    border-radius: 1px;
+  }
+
+  .hive-manage-title {
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin: 0 0 12px;
+    color: #ffffff;
+  }
+
+  .hive-manage-pill-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .hive-hero-pill {
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    backdrop-filter: blur(4px);
+  }
+  .hive-hero-pill.category {
+    background: rgba(20, 184, 166, 0.25);
+    color: #5eead4;
+    border: 1px solid rgba(94, 234, 212, 0.4);
+  }
+  .hive-hero-pill.status-completed {
+    background: rgba(16, 185, 129, 0.25);
+    color: #6ee7b7;
+    border: 1px solid rgba(110, 231, 183, 0.4);
+  }
+  .hive-hero-pill.status-upcoming {
+    background: rgba(245, 158, 11, 0.25);
+    color: #fde68a;
+    border: 1px solid rgba(253, 230, 138, 0.4);
+  }
+
+  .hive-manage-actions-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .hive-btn-public-view {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #ffffff;
+    color: var(--hive-dark-navy);
+    font-weight: 700;
+    font-size: 13px;
+    padding: 8px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transition: all 0.2s ease;
+  }
+  .hive-btn-public-view:hover {
+    background: #f8fafc;
+    transform: translateY(-1px);
+  }
+  .hive-btn-edit-event {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(5, 29, 45, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    backdrop-filter: blur(6px);
+    transition: all 0.2s ease;
+  }
+  .hive-btn-edit-event:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+  .hive-btn-delete-event {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(220, 38, 38, 0.2);
+    border: 1px solid rgba(248, 113, 113, 0.4);
+    color: #fca5a5;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    transition: all 0.2s ease;
+  }
+  .hive-btn-delete-event:hover {
+    background: rgba(220, 38, 38, 0.35);
+    color: #fee2e2;
+  }
+
+  /* -------------------------------------------------------------
+     EVENT OVERVIEW & METRICS TOP CARD (Matching Reference UI)
+     ------------------------------------------------------------- */
+  .hive-overview-top-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #eef2f6;
+    box-shadow: 0 4px 20px rgba(7, 37, 59, 0.04);
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: auto 1fr 1.3fr auto;
+    gap: 24px;
+    align-items: center;
+  }
+
+  /* Date badge */
+  .hive-overview-date-badge {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px 14px;
+    text-align: center;
+    min-width: 68px;
+  }
+  .hive-overview-date-icon {
+    font-size: 14px;
+    color: #64748b;
+  }
+  .hive-overview-date-month {
+    font-size: 11px;
+    font-weight: 800;
+    color: #64748b;
+    letter-spacing: 0.06em;
+  }
+  .hive-overview-date-day {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--hive-text-title);
+    line-height: 1.1;
+  }
+  .hive-overview-date-year {
+    font-size: 10px;
+    color: #94a3b8;
+    font-weight: 600;
+  }
+
+  /* Details list */
+  .hive-overview-meta-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 12.5px;
+    color: var(--hive-text-body);
+  }
+  .hive-overview-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hive-overview-meta-item strong {
+    color: var(--hive-text-title);
+  }
+
+  /* Description and status snippet */
+  .hive-overview-desc-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-left: 16px;
+    border-left: 1px solid #f1f5f9;
+  }
+  .hive-overview-desc-text {
+    font-size: 12.5px;
+    color: var(--hive-text-muted);
+    line-height: 1.5;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Registrations callout */
+  .hive-overview-reg-box {
+    background: #f8fafc;
+    border: 1px solid #eef2f6;
+    border-radius: 14px;
+    padding: 14px 18px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 140px;
+  }
+  .hive-reg-box-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--hive-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .hive-reg-box-num {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--hive-text-title);
+    line-height: 1;
+  }
+  .hive-btn-view-regs {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #ffffff;
+    background: var(--hive-dark-navy);
+    padding: 6px 12px;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: background 0.15s ease;
+    white-space: nowrap;
+  }
+  .hive-btn-view-regs:hover {
+    background: var(--hive-navy-700);
+  }
+
+  /* -------------------------------------------------------------
+     METRICS BAR (5 Compact KPI Cards)
+     ------------------------------------------------------------- */
+  .hive-metrics-5bar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .hive-metric-small-card {
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #eef2f6;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 2px 10px rgba(7, 37, 59, 0.03);
+  }
+  .hive-metric-sm-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .hive-metric-sm-icon.blue { background: #eff6ff; color: #2563eb; }
+  .hive-metric-sm-icon.green { background: #ecfdf5; color: #10b981; }
+  .hive-metric-sm-icon.purple { background: #f5f3ff; color: #7c3aed; }
+  .hive-metric-sm-icon.amber { background: #fffbeb; color: #d97706; }
+  .hive-metric-sm-icon.teal { background: #f0fdfa; color: #0d9488; }
+
+  .hive-metric-sm-num {
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--hive-text-title);
+    line-height: 1.1;
+  }
+  .hive-metric-sm-label {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--hive-text-muted);
+    margin-top: 1px;
+    white-space: nowrap;
+  }
+
+  /* -------------------------------------------------------------
+     MANAGEMENT TABS BAR
+     ------------------------------------------------------------- */
+  .hive-tabs-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #eef2f6;
+    padding: 6px;
+    margin-bottom: 24px;
+    overflow-x: auto;
+    box-shadow: 0 2px 12px rgba(7, 37, 59, 0.03);
+  }
+  .hive-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--hive-text-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+    text-decoration: none;
+  }
+  .hive-tab-btn:hover {
+    color: var(--hive-dark-navy);
+    background: #f8fafc;
+  }
+  .hive-tab-btn.active {
+    background: var(--hive-dark-navy);
+    color: #ffffff;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(5, 29, 45, 0.15);
+  }
+
+  .hive-tab-pane {
+    display: none;
+  }
+  .hive-tab-pane.active {
+    display: block;
+    animation: hiveFadeIn 0.2s ease-out;
+  }
+  @keyframes hiveFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* -------------------------------------------------------------
+     TAB 1: OVERVIEW GRIDS & CARDS
+     ------------------------------------------------------------- */
+  .hive-overview-grid-3 {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 22px;
+  }
+  .hive-card-module {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #eef2f6;
+    box-shadow: 0 4px 20px rgba(7, 37, 59, 0.04);
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .hive-card-module-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--hive-text-title);
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .hive-card-highlights {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--hive-text-body);
+  }
+  .hive-card-highlights li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .hive-quick-actions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .hive-quick-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: var(--hive-text-title);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+  .hive-quick-btn.primary {
+    background: var(--hive-dark-navy);
+    color: #ffffff;
+    border-color: var(--hive-dark-navy);
+  }
+  .hive-quick-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Status Timeline */
+  .hive-status-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+    font-size: 12px;
+  }
+  .hive-timeline-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--hive-text-body);
+  }
+  .hive-timeline-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ecfdf5;
+    color: #10b981;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  /* Feature Strip 4-Cards */
+  .hive-feature-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .hive-feature-action-card {
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #eef2f6;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 4px 16px rgba(7, 37, 59, 0.03);
+    min-height: 150px;
+  }
+  .hive-feature-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--hive-text-title);
+    margin: 6px 0 4px;
+  }
+  .hive-feature-desc {
+    font-size: 11.5px;
+    color: var(--hive-text-muted);
+    line-height: 1.4;
+    margin: 0 0 12px;
+  }
+  .hive-btn-card-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--hive-dark-navy);
+    background: #f8fafc;
+    border: 1px solid #dbe3e8;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+  .hive-btn-card-action:hover {
+    background: #ffffff;
+    border-color: var(--hive-teal-600);
+    color: var(--hive-teal-600);
+  }
+
+  /* -------------------------------------------------------------
+     SAAS DATA TABLES
+     ------------------------------------------------------------- */
+  .hive-table-container {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #eef2f6;
+    box-shadow: 0 4px 20px rgba(7, 37, 59, 0.04);
+    padding: 22px;
+    margin-bottom: 24px;
+  }
+  .hive-table-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .hive-table-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--hive-text-title);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+  }
+  .hive-saas-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .hive-saas-table th {
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 12px 16px;
+    border: none;
+  }
+  .hive-saas-table th:first-child { border-radius: 8px 0 0 8px; }
+  .hive-saas-table th:last-child { border-radius: 0 8px 8px 0; text-align: right; }
+  .hive-saas-table td {
+    padding: 14px 16px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 13px;
+    color: var(--hive-text-body);
+  }
+  .hive-saas-table tbody tr:hover {
+    background: #f8fafc;
+  }
+  .hive-saas-table td:last-child {
+    text-align: right;
+  }
+
+  /* Status Badges */
+  .hive-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 700;
+  }
+  .hive-badge-pill.green { background: #ecfdf5; color: #0e8a5b; border: 1px solid #a7f3d0; }
+  .hive-badge-pill.red { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+  .hive-badge-pill.gold { background: #fefce8; color: #ca8a04; border: 1px solid #fef08a; }
+
+  /* Forms & Collapsibles */
+  .hive-form-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #eef2f6;
+    box-shadow: 0 4px 20px rgba(7, 37, 59, 0.04);
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .hive-collapsible-summary {
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--hive-dark-navy);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+  }
+
+  /* Footer Matching /events */
+  .footer {
+    background: var(--hive-dark-navy) !important;
+    color: #cbd5e1 !important;
+    margin-top: 40px !important;
+    padding: 44px 20px 24px !important;
+    border-top: none !important;
+  }
+  .footer-inner {
+    max-width: 1240px !important;
+    margin: 0 auto !important;
+    display: grid !important;
+    grid-template-columns: 2fr 1.2fr 1.8fr !important;
+    gap: 36px !important;
+    align-items: start !important;
+  }
+  .hive-footer-brand-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .hive-footer-logo {
+    height: 36px;
+    width: auto;
+    object-fit: contain;
+  }
+  .hive-footer-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.2;
+  }
+  .hive-footer-sub {
+    font-size: 12px;
+    color: #94a3b8;
+    line-height: 1.2;
+  }
+  .hive-footer-campus {
+    font-size: 12.5px;
+    color: #94a3b8;
+    margin-top: 6px;
+  }
+  .hive-footer-links-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .hive-footer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 13px;
+  }
+  .hive-footer-links a {
+    color: #cbd5e1;
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+  .hive-footer-links a:hover {
+    color: #ffffff;
+  }
+  .hive-footer-bottom-bar {
+    max-width: 1240px;
+    margin: 28px auto 0;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11.5px;
+    color: #64748b;
+  }
+  .hive-footer-tagline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #94a3b8;
+    font-weight: 600;
+  }
+  .hive-footer-gold-bar {
+    width: 24px;
+    height: 3px;
+    background: var(--hive-gold-400);
+    border-radius: 2px;
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 1024px) {
+    .hive-overview-top-card {
+      grid-template-columns: 1fr 1fr;
+    }
+    .hive-overview-grid-3 {
+      grid-template-columns: 1fr;
+    }
+    .hive-metrics-5bar {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .hive-feature-grid-4 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hive-manage-hero {
+      min-height: auto;
+    }
+    .hive-manage-hero-building-bg {
+      opacity: 0.2;
+      width: 100%;
+    }
+    .hive-manage-hero-inner {
+      padding: 24px 20px;
+    }
+    .hive-manage-title {
+      font-size: 24px;
+    }
+    .hive-overview-top-card {
+      grid-template-columns: 1fr;
+    }
+    .hive-metrics-5bar {
+      grid-template-columns: 1fr 1fr;
+    }
+    .hive-feature-grid-4 {
+      grid-template-columns: 1fr;
+    }
+    .footer-inner {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+{# -------------------------------------------------------------
+   1. HERO BANNER
+   ------------------------------------------------------------- #}
+<section class="hive-manage-hero">
+  <div class="hive-manage-hero-building-bg">
+    <img 
+      class="hive-manage-hero-campus-img" 
+      src="{{ url_for('static', filename='images/srit_campus.jpg') }}" 
+      alt="Sri Ramakrishna Institute of Technology"
+      loading="eager"
+    >
+    <div class="hive-manage-hero-img-overlay"></div>
+  </div>
+
+  <div class="hive-manage-hero-inner">
+    <a href="{{ url_for('events') }}" class="hive-back-link">
+      ← Back to Events
+    </a>
+
+    <div class="hive-manage-eyebrow">Manage Event</div>
+
+    <h1 class="hive-manage-title">{{ event['title'] }}</h1>
+
+    <div class="hive-manage-pill-row">
+      <span class="hive-hero-pill category">
+        🏷️ {{ event['program_name'] or 'Event' }}
+      </span>
+      <span class="hive-hero-pill {% if event['status'] == 'Completed' %}status-completed{% else %}status-upcoming{% endif %}">
+        ● {{ event['status'] or 'Upcoming' }}
+      </span>
+    </div>
+
+    <div class="hive-manage-actions-row">
+      <a class="hive-btn-public-view" href="{{ url_for('event_detail', event_id=event['id']) }}">
+        👁 Public View
+      </a>
+      <a class="hive-btn-edit-event" href="{{ url_for('edit_event', event_id=event['id']) }}">
+        ✏ Edit Event
+      </a>
+      <form method="post" action="{{ url_for('delete_event', event_id=event['id']) }}" onsubmit="return confirm('Delete this event? This action cannot be undone.');" style="display:inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="hive-btn-delete-event">
+          🗑 Delete Event
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+{# -------------------------------------------------------------
+   2. EVENT OVERVIEW STRIP
+   ------------------------------------------------------------- #}
+<section class="hive-overview-top-card">
+  <div class="hive-overview-date-badge">
+    <div class="hive-overview-date-icon">📅</div>
+    <div class="hive-overview-date-month">DATE</div>
+    <div class="hive-overview-date-day">{{ event['event_date'][:2] if event['event_date'] else '01' }}</div>
+    <div class="hive-overview-date-year">2026</div>
+  </div>
+
+  <div class="hive-overview-meta-list">
+    <div class="hive-overview-meta-item">
+      <span>🕒</span> <span><strong>Date:</strong> {{ event['event_date'] or 'N/A' }}</span>
+    </div>
+    <div class="hive-overview-meta-item">
+      <span>📍</span> <span><strong>Venue:</strong> {{ event['venue'] or 'SRIT, Coimbatore' }}</span>
+    </div>
+    <div class="hive-overview-meta-item">
+      <span>👥</span> <span><strong>Organizer:</strong> {{ event.get('organizing_details') or 'SRIT HIVE' }}</span>
+    </div>
+    <div class="hive-overview-meta-item">
+      <span>🏷️</span> <span><strong>Category:</strong> {{ event['program_name'] or 'Innovation' }}</span>
+    </div>
+  </div>
+
+  <div class="hive-overview-desc-block">
+    <span class="hive-badge-pill {% if event['status'] == 'Completed' %}green{% else %}gold{% endif %}">
+      ✓ {{ event['status'] or 'Active' }}
+    </span>
+    <p class="hive-overview-desc-text">
+      {{ event['description'] or 'Platform for student innovators to present their ideas and engage with mentors and experts.' }}
+    </p>
+  </div>
+
+  <div class="hive-overview-reg-box">
+    <div class="hive-reg-box-header">
+      <span>👥</span> Total Registrations
+    </div>
+    <div class="hive-reg-box-num">{{ participants|length }}</div>
+    <a href="#tab-participants" class="hive-btn-view-regs" onclick="switchTab('tab-participants')">
+      View Registrations →
+    </a>
+  </div>
+</section>
+
+{# -------------------------------------------------------------
+   3. METRICS BAR (5 Compact KPI Cards)
+   ------------------------------------------------------------- #}
+{% set present_count = (participants|selectattr('attendance_status', 'equalto', 'present')|list|length) + (participants|selectattr('attendance', 'equalto', 1)|list|length) %}
+{% set certs_count = participants|selectattr('certificate_file')|list|length %}
+
+<section class="hive-metrics-5bar">
+  <div class="hive-metric-small-card">
+    <div class="hive-metric-sm-icon blue">👥</div>
+    <div>
+      <div class="hive-metric-sm-num">{{ participants|length }}</div>
+      <div class="hive-metric-sm-label">Total Participants</div>
+    </div>
+  </div>
+
+  <div class="hive-metric-small-card">
+    <div class="hive-metric-sm-icon green">✓</div>
+    <div>
+      <div class="hive-metric-sm-num">{{ present_count }}</div>
+      <div class="hive-metric-sm-label">Attendance</div>
+    </div>
+  </div>
+
+  <div class="hive-metric-small-card">
+    <div class="hive-metric-sm-icon purple">📜</div>
+    <div>
+      <div class="hive-metric-sm-num">{{ certs_count }}</div>
+      <div class="hive-metric-sm-label">Certificates Issued</div>
+    </div>
+  </div>
+
+  <div class="hive-metric-small-card">
+    <div class="hive-metric-sm-icon amber">💬</div>
+    <div>
+      <div class="hive-metric-sm-num">{{ feedback_list|length }}</div>
+      <div class="hive-metric-sm-label">Feedback Received</div>
+    </div>
+  </div>
+
+  <div class="hive-metric-small-card">
+    <div class="hive-metric-sm-icon teal">📷</div>
+    <div>
+      <div class="hive-metric-sm-num">{{ media_summary.total_uploaded if media_summary else (photo_count or 0) }}</div>
+      <div class="hive-metric-sm-label">Media Completed</div>
+    </div>
+  </div>
+</section>
+
+{# -------------------------------------------------------------
+   4. NAVIGATION TABS BAR
+   ------------------------------------------------------------- #}
+<div class="hive-tabs-nav">
+  <button type="button" class="hive-tab-btn active" data-tab="tab-overview" onclick="switchTab('tab-overview')">
+    🏠 Overview
+  </button>
+  <button type="button" class="hive-tab-btn" data-tab="tab-participants" onclick="switchTab('tab-participants')">
+    👥 Participants &amp; Certificates
+  </button>
+  <button type="button" class="hive-tab-btn" data-tab="tab-update" onclick="switchTab('tab-update')">
+    📝 Post Update
+  </button>
+  <button type="button" class="hive-tab-btn" data-tab="tab-recorder" onclick="switchTab('tab-recorder')">
+    🎙 Voice Recorder
+  </button>
+  <button type="button" class="hive-tab-btn" data-tab="tab-media" onclick="switchTab('tab-media')">
+    📷 Photographs &amp; Media
+  </button>
+  <button type="button" class="hive-tab-btn" data-tab="tab-report" onclick="switchTab('tab-report')">
+    📄 Event Report
+  </button>
+  <button type="button" class="hive-tab-btn" data-tab="tab-sop" onclick="switchTab('tab-sop')">
+    📋 SOP
+  </button>
+  <button type="button" class="hive-tab-btn" data-tab="tab-feedback" onclick="switchTab('tab-feedback')">
+    💬 Student Feedback
+  </button>
+</div>
+
+{# -------------------------------------------------------------
+   TAB 1: OVERVIEW
+   ------------------------------------------------------------- #}
+<div id="tab-overview" class="hive-tab-pane active">
+  <div class="hive-overview-grid-3">
+    <!-- Event Summary -->
+    <div class="hive-card-module">
+      <div>
+        <div class="hive-card-module-header">
+          <span>📅</span> Event Summary
+        </div>
+        <p style="font-size: 13px; color: var(--hive-text-body); line-height: 1.5; margin: 0 0 12px;">
+          {{ event['description'] or 'Sri Ramakrishna Institute of Technology hosted this session to bring together innovators and mentors.' }}
+        </p>
+        <div style="background: #f8fafc; border-radius: 10px; padding: 12px; border: 1px solid #eef2f6;">
+          <strong style="font-size: 12px; color: var(--hive-text-title);">🏛️ Event Highlights</strong>
+          <ul class="hive-card-highlights">
+            <li>✓ {{ event['program_name'] or 'Interactive session' }}</li>
+            <li>✓ {{ event.get('speaker_name') or 'Expert faculty mentor interaction' }}</li>
+            <li>✓ Innovation &amp; student entrepreneurship focus</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="hive-card-module">
+      <div>
+        <div class="hive-card-module-header">
+          <span>⚡</span> Quick Actions
+        </div>
+        <div class="hive-quick-actions-list">
+          <a class="hive-quick-btn primary" href="{{ url_for('event_detail', event_id=event['id']) }}">
+            <span>View Event Details</span> <span>→</span>
+          </a>
+          <a class="hive-quick-btn" href="#tab-participants" onclick="switchTab('tab-participants')">
+            <span>Manage Registrations</span> <span>👥</span>
+          </a>
+          <a class="hive-quick-btn" href="#tab-participants" onclick="switchTab('tab-participants'); scrollToCertSection();">
+            <span>Download Certificates</span> <span>📥</span>
+          </a>
+          <a class="hive-quick-btn" href="#tab-sop" onclick="switchTab('tab-sop')">
+            <span>Generate SOP Document</span> <span>📋</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Event Status & Milestones -->
+    <div class="hive-card-module">
+      <div>
+        <div class="hive-card-module-header">
+          <span>✓</span> Event Status
+        </div>
+        <form method="post" style="margin-bottom: 12px;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="action" value="update_status">
+          <div style="display: flex; gap: 8px;">
+            <select name="status" style="flex: 1; padding: 6px 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 12.5px;">
+              <option value="Upcoming" {% if event['status']=='Upcoming' %}selected{% endif %}>Upcoming</option>
+              <option value="Open" {% if event['status']=='Open' %}selected{% endif %}>Open</option>
+              <option value="Ongoing" {% if event['status']=='Ongoing' %}selected{% endif %}>Ongoing</option>
+              <option value="Completed" {% if event['status']=='Completed' %}selected{% endif %}>Completed</option>
+              <option value="Cancelled" {% if event['status']=='Cancelled' %}selected{% endif %}>Cancelled</option>
+            </select>
+            <button type="submit" class="btn btn-dark" style="padding: 6px 12px; font-size: 12px;">Save</button>
+          </div>
+        </form>
+
+        <div class="hive-status-timeline">
+          <div class="hive-timeline-item">
+            <div class="hive-timeline-dot">✓</div>
+            <span>Event Created &bull; Published</span>
+          </div>
+          <div class="hive-timeline-item">
+            <div class="hive-timeline-dot">✓</div>
+            <span>Registrations Active &bull; {{ participants|length }} registered</span>
+          </div>
+          <div class="hive-timeline-item">
+            <div class="hive-timeline-dot">✓</div>
+            <span>Status &bull; <b>{{ event['status'] or 'Active' }}</b></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature Action Strip (4 Cards) -->
+  <div class="hive-feature-grid-4">
+    <div class="hive-feature-action-card">
+      <div>
+        <span style="font-size: 24px;">📄</span>
+        <div class="hive-feature-title">Event Report</div>
+        <div class="hive-feature-desc">Generate print-ready completion report with photo gallery.</div>
+      </div>
+      <a href="#tab-report" class="hive-btn-card-action" onclick="switchTab('tab-report')">Generate Report →</a>
+    </div>
+
+    <div class="hive-feature-action-card">
+      <div>
+        <span style="font-size: 24px;">📋</span>
+        <div class="hive-feature-title">Official SOP</div>
+        <div class="hive-feature-desc">Official SRIT application for organizing programme.</div>
+      </div>
+      <a href="#tab-sop" class="hive-btn-card-action" onclick="switchTab('tab-sop')">Download SOP →</a>
+    </div>
+
+    <div class="hive-feature-action-card">
+      <div>
+        <span style="font-size: 24px;">📷</span>
+        <div class="hive-feature-title">Photographs &amp; Media</div>
+        <div class="hive-feature-desc">Upload banner, speaker, crowd and geotagged images.</div>
+      </div>
+      <a href="#tab-media" class="hive-btn-card-action" onclick="switchTab('tab-media')">Manage Media →</a>
+    </div>
+
+    <div class="hive-feature-action-card">
+      <div>
+        <span style="font-size: 24px;">🎙</span>
+        <div class="hive-feature-title">Voice &amp; Transcript</div>
+        <div class="hive-feature-desc">Live speech-to-text recording and speaker notes.</div>
+      </div>
+      <a href="#tab-recorder" class="hive-btn-card-action" onclick="switchTab('tab-recorder')">View Recorder →</a>
+    </div>
+  </div>
+</div>
+
+{# -------------------------------------------------------------
+   TAB 2: PARTICIPANTS & CERTIFICATES
+   ------------------------------------------------------------- #}
+<div id="tab-participants" class="hive-tab-pane">
+  <div class="hive-table-container">
+    <div class="hive-table-header-row">
+      <h2 class="hive-table-title">👥 Participants &amp; Certificates</h2>
+      <span style="font-size: 12.5px; color: var(--hive-text-muted);">
+        Total: <b>{{ participants|length }}</b> registered &bull; <b>{{ present_count }}</b> present
+      </span>
+    </div>
+
+    <div style="overflow-x: auto;">
+      <table class="hive-saas-table">
+        <thead>
+          <tr>
+            <th>STUDENT NAME</th>
+            <th>DEPARTMENT</th>
+            <th>REGISTRATION ID</th>
+            <th>ATTENDANCE</th>
+            <th>CERTIFICATE</th>
+            <th>ACTION</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in participants %}
+            <tr>
+              <td>
+                <strong style="color: var(--hive-text-title); font-size: 13.5px;">{{ p['name'] }}</strong>
+                <div style="font-size: 11px; color: #64748b; margin-top: 2px;">{{ p['email'] }}</div>
+              </td>
+              <td>
+                <div>{{ p['department'] }}</div>
+                <div style="font-size: 11px; color: #64748b;">{{ p['year'] }}</div>
+              </td>
+              <td>
+                <span style="font-family: monospace; font-size: 12px; color: var(--hive-text-title);">{{ p['reg_no'] }}</span>
+              </td>
+              <td>
+                {% if p['attendance_status'] == 'present' or p['attendance'] == 1 %}
+                  <span class="hive-badge-pill green">✓ Present</span>
+                  <form class="inline-form" method="post" style="margin-left: 6px;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="action" value="attendance">
+                    <input type="hidden" name="registration_id" value="{{ p['id'] }}">
+                    <input type="hidden" name="status" value="absent">
+                    <input type="hidden" name="attendance" value="0">
+                    <button class="btn btn-secondary" style="padding: 2px 6px; font-size: 10px;">Mark Absent</button>
+                  </form>
+                {% elif p['attendance_status'] == 'absent' %}
+                  <span class="hive-badge-pill red">✗ Absent</span>
+                  <form class="inline-form" method="post" style="margin-left: 6px;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="action" value="attendance">
+                    <input type="hidden" name="registration_id" value="{{ p['id'] }}">
+                    <input type="hidden" name="status" value="present">
+                    <input type="hidden" name="attendance" value="1">
+                    <button class="btn btn-success" style="padding: 2px 6px; font-size: 10px;">Mark Present</button>
+                  </form>
+                {% else %}
+                  <span class="hive-badge-pill gold">Pending</span>
+                  <div style="display:inline-flex; gap:4px; margin-left:6px;">
+                    <form class="inline-form" method="post">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      <input type="hidden" name="action" value="attendance">
+                      <input type="hidden" name="registration_id" value="{{ p['id'] }}">
+                      <input type="hidden" name="status" value="present">
+                      <input type="hidden" name="attendance" value="1">
+                      <button class="btn btn-success" style="padding: 2px 6px; font-size: 10px;">Present</button>
+                    </form>
+                    <form class="inline-form" method="post">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      <input type="hidden" name="action" value="attendance">
+                      <input type="hidden" name="registration_id" value="{{ p['id'] }}">
+                      <input type="hidden" name="status" value="absent">
+                      <input type="hidden" name="attendance" value="0">
+                      <button class="btn btn-secondary" style="padding: 2px 6px; font-size: 10px; color:#dc2626;">Absent</button>
+                    </form>
+                  </div>
+                {% endif %}
+              </td>
+              <td>
+                {% if (p['attendance_status'] == 'present' or p['attendance'] == 1) and p['certificate_file'] %}
+                  <span class="hive-badge-pill green">✓ Issued ({{ p['certificate_type'] or 'Participation' }})</span>
+                {% elif p['attendance_status'] == 'absent' %}
+                  <span style="font-size: 11.5px; color: #94a3b8;">None (Absent)</span>
+                {% else %}
+                  <span style="font-size: 11.5px; color: #94a3b8;">Not generated</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if (p['attendance_status'] == 'present' or p['attendance'] == 1) and p['certificate_file'] %}
+                  <a class="btn btn-success" href="{{ url_for('download_certificate', filename=p['certificate_file']) }}" style="padding: 4px 10px; font-size: 11.5px;">📥 Download PDF</a>
+                {% elif p['attendance_status'] == 'present' or p['attendance'] == 1 %}
+                  <form class="inline-form" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="action" value="certificate">
+                    <input type="hidden" name="registration_id" value="{{ p['id'] }}">
+                    <select name="certificate_type" style="padding: 3px 6px; font-size: 11px;">
+                      <option value="Participation">Participation</option>
+                      <option value="Merit">Merit</option>
+                      <option value="Winner">Winner</option>
+                    </select>
+                    <button type="submit" class="btn btn-dark" style="padding: 4px 8px; font-size: 11px;">Generate</button>
+                  </form>
+                {% else %}
+                  <button class="btn btn-secondary" disabled style="opacity: 0.5; padding: 4px 8px; font-size: 11px; cursor: not-allowed;">Generate (Present Only)</button>
+                {% endif %}
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="6" style="text-align: center; color: var(--hive-text-muted); padding: 30px;">No registrations yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CERTIFICATE CUSTOMIZER (Collapsible Card) -->
+  <div class="hive-form-card" id="certificate-template-section">
+    <details>
+      <summary class="hive-collapsible-summary">
+        <span>🎨 Customize Certificate Template (Logos, Signatures &amp; Colors)</span>
+        <span style="font-size: 12px; color: var(--hive-teal-600);">Click to Expand / Configure ▾</span>
+      </summary>
+
+      <div style="margin-top: 20px;">
+        {% set t_data = cert_template or {} %}
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 14px;">
+          <a href="{{ url_for('preview_certificate_template', event_id=event['id']) }}" target="_blank" class="btn btn-secondary" style="font-size: 12px; padding: 6px 14px;">
+            👁️ Preview Certificate (PDF)
+          </a>
+        </div>
+
+        <form method="post" action="{{ url_for('save_certificate_template', event_id=event['id']) }}" enctype="multipart/form-data">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="action" value="save">
+
+          <!-- 1. Institutional Text -->
+          <div style="font-weight: 700; color: var(--hive-text-title); font-size: 13.5px; margin-bottom: 10px;">
+            🏛️ Header &amp; Institutional Text
+          </div>
+          <div class="form-grid">
+            <div class="field full">
+              <label>Institution Name</label>
+              <input type="text" name="institution_name" value="{{ t_data.get('institution_name', 'SRI RAMAKRISHNA INSTITUTE OF TECHNOLOGY') }}">
+            </div>
+            <div class="field full">
+              <label>Unit / Tagline</label>
+              <input type="text" name="tagline" value="{{ t_data.get('tagline', 'HIVE • HUB FOR INNOVATION AND ENTREPRENEURSHIP') }}">
+            </div>
+            <div class="field full">
+              <label>Certificate Body Phrase</label>
+              <input type="text" name="body_text" value="{{ t_data.get('body_text', 'for successfully participating in / contributing to') }}">
+            </div>
+            <div class="field">
+              <label>Footer Line 1</label>
+              <input type="text" name="footer_line1" value="{{ t_data.get('footer_line1', 'Hub for Innovation and Entrepreneurship (HIVE)') }}">
+            </div>
+            <div class="field">
+              <label>Footer Line 2</label>
+              <input type="text" name="footer_line2" value="{{ t_data.get('footer_line2', 'Sri Ramakrishna Institute of Technology • Coimbatore') }}">
+            </div>
+          </div>
+
+          <!-- 2. Colors -->
+          <div style="font-weight: 700; color: var(--hive-text-title); font-size: 13.5px; margin: 18px 0 10px;">
+            🎨 Color Styling
+          </div>
+          <div class="form-grid">
+            <div class="field"><label>Background (Hex)</label><input type="text" name="bg_color" value="{{ t_data.get('bg_color', '#f7fbff') }}"></div>
+            <div class="field"><label>Border (Hex)</label><input type="text" name="border_color" value="{{ t_data.get('border_color', '#0b4f6c') }}"></div>
+            <div class="field"><label>Student Name Color (Hex)</label><input type="text" name="name_color" value="{{ t_data.get('name_color', '#0b4f6c') }}"></div>
+            <div class="field"><label>Badge Color (Hex)</label><input type="text" name="badge_color" value="{{ t_data.get('badge_color', '#d39b2a') }}"></div>
+          </div>
+
+          <!-- 3. Logos -->
+          <div style="font-weight: 700; color: var(--hive-text-title); font-size: 13.5px; margin: 18px 0 10px;">
+            🏷️ Logos (JPG/PNG, Max 1MB)
+          </div>
+          {% set logos_dict = {} %}
+          {% for lg in (t_data.get('logos') or []) %}
+            {% if lg.get('slot') %}{% set _ = logos_dict.update({lg.get('slot'): lg}) %}{% endif %}
+          {% endfor %}
+          <div class="grid-2">
+            {% for slot_key, slot_label in cert_logo_slots.items() %}
+              {% set cur_lg = logos_dict.get(slot_key, {}) %}
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                  <strong style="font-size: 12px;">{{ slot_label }}</strong>
+                  <label style="font-size: 11.5px; cursor: pointer;">
+                    <input type="checkbox" name="show_logo_{{ slot_key }}" value="1" {% if cur_lg.get('show') %}checked{% endif %}> Show
+                  </label>
+                </div>
+                <input type="file" name="file_logo_{{ slot_key }}" accept=".jpg,.jpeg,.png" style="font-size: 11px; width: 100%; margin-bottom: 6px;">
+                <div style="display: flex; gap: 8px;">
+                  <input type="number" name="order_logo_{{ slot_key }}" value="{{ cur_lg.get('order', loop.index) }}" min="1" max="10" placeholder="Order" style="flex:1; font-size:11.5px; padding:3px 6px;">
+                  <input type="number" name="width_logo_{{ slot_key }}" value="{{ cur_lg.get('width', 60) }}" min="30" max="150" placeholder="Width" style="flex:1; font-size:11.5px; padding:3px 6px;">
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <!-- 4. Signatures -->
+          <div style="font-weight: 700; color: var(--hive-text-title); font-size: 13.5px; margin: 18px 0 10px;">
+            ✍️ Signatures &amp; Signatories
+          </div>
+          {% set sigs_dict = {} %}
+          {% for sg in (t_data.get('signatures') or []) %}
+            {% if sg.get('slot') %}{% set _ = sigs_dict.update({sg.get('slot'): sg}) %}{% endif %}
+          {% endfor %}
+          <div class="grid-2">
+            {% for slot_key, slot_label in cert_sig_slots.items() %}
+              {% set cur_sg = sigs_dict.get(slot_key, {}) %}
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                  <strong style="font-size: 12px;">{{ slot_label }}</strong>
+                  <label style="font-size: 11.5px; cursor: pointer;">
+                    <input type="checkbox" name="show_sig_{{ slot_key }}" value="1" {% if cur_sg.get('show') %}checked{% endif %}> Include
+                  </label>
+                </div>
+                <input type="file" name="file_sig_{{ slot_key }}" accept=".jpg,.jpeg,.png" style="font-size: 11px; width: 100%; margin-bottom: 6px;">
+                <input type="text" name="name_sig_{{ slot_key }}" value="{{ cur_sg.get('name', '') }}" placeholder="Signatory Full Name" style="width: 100%; font-size: 11.5px; padding: 3px 6px; margin-bottom: 4px;">
+                <input type="text" name="desig_sig_{{ slot_key }}" value="{{ cur_sg.get('designation', '') }}" placeholder="Designation (e.g. Principal)" style="width: 100%; font-size: 11.5px; padding: 3px 6px;">
+              </div>
+            {% endfor %}
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 18px;">
+            <button type="submit" class="btn btn-primary" style="padding: 8px 20px; font-size: 13px;">
+              💾 Save Certificate Template
+            </button>
+          </div>
+        </form>
+
+        <div style="border-top: 1px solid #f1f5f9; margin-top: 14px; padding-top: 10px; display: flex; justify-content: flex-end;">
+          <form method="post" action="{{ url_for('save_certificate_template', event_id=event['id']) }}" onsubmit="return confirm('Reset template to default?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="action" value="reset">
+            <button type="submit" class="btn btn-secondary" style="font-size: 11.5px; color: #dc2626;">↺ Reset to Default</button>
+          </form>
+        </div>
+      </div>
+    </details>
+  </div>
+</div>
+
+{# -------------------------------------------------------------
+   TAB 3: POST UPDATE
+   ------------------------------------------------------------- #}
+<div id="tab-update" class="hive-tab-pane">
+  <div class="hive-form-card" style="max-width: 720px; margin: 0 auto 30px;">
+    <h2 class="hive-table-title" style="margin-bottom: 12px;">📝 Publish Live Event Update</h2>
+    <p style="font-size: 13px; color: var(--hive-text-muted); margin-bottom: 18px;">
+      Post announcements and live highlights visible on the student dashboard and event page.
+    </p>
+
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="post_update">
+      <div class="field full" style="margin-bottom: 14px;">
+        <label>Update Title</label>
+        <input type="text" name="title" placeholder="e.g. Round 1 Results Announced / Venue Shift" required>
+      </div>
+      <div class="field full" style="margin-bottom: 18px;">
+        <label>Announcement Message</label>
+        <textarea name="message" placeholder="Provide event details, instructions, or next steps for participants..." style="min-height: 120px;" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary" style="padding: 10px 24px; font-size: 13.5px;">📢 Publish Update</button>
+    </form>
+  </div>
+</div>
+
+{# -------------------------------------------------------------
+   TAB 4: VOICE RECORDER & TRANSCRIPT
+   ------------------------------------------------------------- #}
+<div id="tab-recorder" class="hive-tab-pane">
+  <div class="grid-2">
+    <!-- Recorder Interface -->
+    <div class="hive-form-card">
+      <h2 class="hive-table-title" style="margin-bottom: 12px;">🎙 Voice Recorder &amp; Speech-to-Text</h2>
+      <p style="font-size: 12.5px; color: var(--hive-text-muted); margin-bottom: 14px;">
+        Record keynote talks and auto-transcribe spoken words into text in real-time.
+      </p>
+
+      <div style="margin: 12px 0; padding: 12px; background: #f8fafc; border-radius: 10px; border: 1px dashed #dbe3e8;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div><strong>Status:</strong> <span id="recording-status" class="hive-badge-pill gold">Idle</span></div>
+          <div><strong>Duration:</strong> <span id="recording-duration" style="font-family: monospace; font-weight: bold; font-size: 14px;">00:00</span></div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;">
+        <button type="button" id="btn-start" class="btn btn-success" style="font-size: 12.5px;">🎤 Start Recording</button>
+        <button type="button" id="btn-stop" class="btn btn-danger" style="font-size: 12.5px;" disabled>⏹ Stop</button>
+        <button type="button" id="btn-clear" class="btn btn-secondary" style="font-size: 12.5px;">🗑 Clear</button>
+      </div>
+
+      <form method="post" action="{{ url_for('save_transcript', event_id=event['id']) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="field full">
+          <label for="transcript-area">Transcript Text</label>
+          <textarea id="transcript-area" name="transcript" placeholder="Speak to record transcript, or type manually here..." style="min-height: 160px;" required></textarea>
+        </div>
+        <br>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">💾 Save Transcript</button>
+      </form>
+    </div>
+
+    <!-- Transcript List -->
+    <div class="hive-form-card">
+      <h2 class="hive-table-title" style="margin-bottom: 12px;">📄 Saved Transcripts ({{ transcripts|length }})</h2>
+      <div style="max-height: 420px; overflow-y: auto; padding-right: 4px;">
+        {% if transcripts %}
+          {% for t in transcripts %}
+            <div style="border-bottom: 1px solid #edf1f3; padding: 12px 0; display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: 600; font-size: 12px; color: var(--hive-text-title);">📅 {{ t['created_at'].replace('T', ' ') }}</span>
+                <span style="font-size: 11px; color: #94a3b8;">By: {{ t['creator'] | default('Faculty') }}</span>
+              </div>
+              <div style="background: #f8fafc; padding: 8px 10px; border-radius: 8px; font-size: 12.5px; color: var(--hive-text-body); max-height: 80px; overflow: hidden; text-overflow: ellipsis; white-space: pre-wrap;">{{ t['transcript'] }}</div>
+              <div style="display: flex; gap: 6px; margin-top: 4px;">
+                <button class="btn btn-secondary" onclick='viewTranscript({{ (t["transcript"] | default("")) |tojson|safe }})' style="padding: 4px 8px; font-size: 11px;">🔍 View</button>
+                <a href="{{ url_for('export_transcript_pdf', event_id=event['id'], transcript_id=t['id']) }}" class="btn btn-dark" style="padding: 4px 8px; font-size: 11px;">📄 PDF</a>
+                <form method="post" action="{{ url_for('delete_transcript', event_id=event['id'], transcript_id=t['id']) }}" style="display: inline;" onsubmit="return confirm('Delete this transcript?');">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn btn-danger" style="padding: 4px 8px; font-size: 11px; color: #dc2626;">❌ Delete</button>
+                </form>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div style="text-align: center; color: var(--hive-text-muted); padding: 30px;">No transcripts saved yet.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{# -------------------------------------------------------------
+   TAB 5: PHOTOGRAPHS & MEDIA
+   ------------------------------------------------------------- #}
+<div id="tab-media" class="hive-tab-pane">
+  <div class="hive-form-card" style="margin-bottom: 20px; border-left: 4px solid var(--hive-teal-600);">
+    <h3 style="color:var(--hive-text-title); margin: 0 0 6px;">📋 Photograph Guidelines</h3>
+    <ol style="margin: 0 0 10px 20px; font-size: 12.5px; color: var(--hive-text-body); line-height: 1.6;">
+      <li>Print/soft copy of the Banner</li>
+      <li>Speaker / Dais Photo with banner visible</li>
+      <li>Participation of Students and Staff</li>
+      <li>Unique / Activity Moments</li>
+      <li>One photo must be geotagged (Max 2MB per photo, JPG/PNG).</li>
+    </ol>
+  </div>
+
+  <form method="post" action="{{ url_for('upload_event_media', event_id=event['id']) }}" enctype="multipart/form-data" id="bulk-media-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <!-- Geotagged Photos -->
+    <div class="hive-table-container">
+      <h3 class="hive-table-title" style="margin-bottom: 12px;">📍 Geotagged Photos</h3>
+      <div class="grid-2">
+        {% for slot_key in ['geotagged_photo_1', 'geotagged_photo_2', 'geotagged_photo_3'] %}
+          {% set s = media_slots[slot_key] %}
+          {% set upload = media_summary.slots.get(slot_key) if media_summary else None %}
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <strong style="font-size: 13px; color: var(--hive-text-title);">{{ s.label }}</strong>
+                <span class="hive-badge-pill {% if upload %}green{% elif s.required %}gold{% else %}default{% endif %}" style="font-size: 10px;">
+                  {% if upload %}✓ Uploaded{% elif s.required %}REQUIRED{% else %}OPTIONAL{% endif %}
+                </span>
+              </div>
+              <div style="font-size: 11px; color: #64748b; margin-bottom: 8px;">{{ s.description }}</div>
+              {% if upload %}
+                <div style="background: #ffffff; border: 1px solid #dcfce7; border-radius: 6px; padding: 6px 10px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                  <img src="{{ upload.relative_url }}" alt="{{ s.label }}" style="width: 36px; height: 36px; object-fit: cover; border-radius: 4px;">
+                  <div style="flex: 1; min-width: 0; font-size: 11px;">
+                    <div style="font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ upload.original_filename or upload.filename }}</div>
+                    <div style="color: #64748b;">{{ upload.file_size_formatted }}</div>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+            <div>
+              {% if upload %}
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                  <a href="{{ url_for('view_event_media', event_id=event['id'], slot_key=slot_key) }}" target="_blank" class="btn btn-secondary" style="padding: 3px 8px; font-size: 11px;">🔍 View</a>
+                  <button type="submit" form="delete-form-{{ slot_key }}" class="btn btn-danger" style="padding: 3px 8px; font-size: 11px; color:#dc2626;" onclick="return confirm('Remove file?');">🗑 Remove</button>
+                </div>
+              {% else %}
+                <input type="file" name="{{ slot_key }}" accept="{{ s.accept }}" onchange="validateFileSize(this, 2)" style="font-size: 11px; width: 100%;">
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Activity Photos -->
+    <div class="hive-table-container">
+      <h3 class="hive-table-title" style="margin-bottom: 12px;">📸 Activity Photographs</h3>
+      <div class="grid-2">
+        {% for slot_key in ['activity_photo_1', 'activity_photo_2', 'activity_photo_3', 'activity_photo_4', 'activity_photo_5'] %}
+          {% set s = media_slots[slot_key] %}
+          {% set upload = media_summary.slots.get(slot_key) if media_summary else None %}
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <strong style="font-size: 13px; color: var(--hive-text-title);">{{ s.label }}</strong>
+                <span class="hive-badge-pill {% if upload %}green{% elif s.required %}gold{% else %}default{% endif %}" style="font-size: 10px;">
+                  {% if upload %}✓ Uploaded{% elif s.required %}REQUIRED{% else %}OPTIONAL{% endif %}
+                </span>
+              </div>
+              <div style="font-size: 11px; color: #64748b; margin-bottom: 8px;">{{ s.description }}</div>
+              {% if upload %}
+                <div style="background: #ffffff; border: 1px solid #dcfce7; border-radius: 6px; padding: 6px 10px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                  <img src="{{ upload.relative_url }}" alt="{{ s.label }}" style="width: 36px; height: 36px; object-fit: cover; border-radius: 4px;">
+                  <div style="flex: 1; min-width: 0; font-size: 11px;">
+                    <div style="font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ upload.original_filename or upload.filename }}</div>
+                    <div style="color: #64748b;">{{ upload.file_size_formatted }}</div>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+            <div>
+              {% if upload %}
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                  <a href="{{ url_for('view_event_media', event_id=event['id'], slot_key=slot_key) }}" target="_blank" class="btn btn-secondary" style="padding: 3px 8px; font-size: 11px;">🔍 View</a>
+                  <button type="submit" form="delete-form-{{ slot_key }}" class="btn btn-danger" style="padding: 3px 8px; font-size: 11px; color:#dc2626;" onclick="return confirm('Remove file?');">🗑 Remove</button>
+                </div>
+              {% else %}
+                <input type="file" name="{{ slot_key }}" accept="{{ s.accept }}" onchange="validateFileSize(this, 2)" style="font-size: 11px; width: 100%;">
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Media Coverage -->
+    <div class="hive-table-container">
+      <h3 class="hive-table-title" style="margin-bottom: 12px;">📰 Media &amp; Social Coverage</h3>
+      <div class="grid-2">
+        {% for slot_key in ['media_pre_activity', 'media_post_activity', 'media_coverage'] %}
+          {% set s = media_slots[slot_key] %}
+          {% set upload = media_summary.slots.get(slot_key) if media_summary else None %}
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <strong style="font-size: 13px; color: var(--hive-text-title);">{{ s.label }}</strong>
+                <span class="hive-badge-pill {% if upload %}green{% else %}default{% endif %}" style="font-size: 10px;">
+                  {% if upload %}✓ Uploaded{% else %}OPTIONAL{% endif %}
+                </span>
+              </div>
+              <div style="font-size: 11px; color: #64748b; margin-bottom: 8px;">{{ s.description }}</div>
+              {% if upload %}
+                <div style="background: #ffffff; border: 1px solid #dcfce7; border-radius: 6px; padding: 6px 10px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                  {% if upload.is_pdf %}<span style="font-size:24px;">📄</span>{% else %}<img src="{{ upload.relative_url }}" alt="{{ s.label }}" style="width: 36px; height: 36px; object-fit: cover; border-radius: 4px;">{% endif %}
+                  <div style="flex: 1; min-width: 0; font-size: 11px;">
+                    <div style="font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ upload.original_filename or upload.filename }}</div>
+                    <div style="color: #64748b;">{{ upload.file_size_formatted }}</div>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+            <div>
+              {% if upload %}
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                  <a href="{{ url_for('view_event_media', event_id=event['id'], slot_key=slot_key) }}" target="_blank" class="btn btn-secondary" style="padding: 3px 8px; font-size: 11px;">🔍 View</a>
+                  <button type="submit" form="delete-form-{{ slot_key }}" class="btn btn-danger" style="padding: 3px 8px; font-size: 11px; color:#dc2626;" onclick="return confirm('Remove file?');">🗑 Remove</button>
+                </div>
+              {% else %}
+                <input type="file" name="{{ slot_key }}" accept="{{ s.accept }}" onchange="validateFileSize(this, 2)" style="font-size: 11px; width: 100%;">
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div style="text-align: right; margin-bottom: 30px;">
+      <button type="submit" class="btn btn-primary" style="padding: 10px 24px; font-size: 13.5px; font-weight: 700;">
+        💾 Save / Upload Selected Photographs &amp; Media
+      </button>
+    </div>
+  </form>
+
+  {% if media_summary and media_summary.slots %}
+    {% for slot_key in media_summary.slots.keys() %}
+      <form id="delete-form-{{ slot_key }}" method="post" action="{{ url_for('delete_event_media', event_id=event['id'], slot_key=slot_key) }}" style="display: none;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      </form>
+    {% endfor %}
+  {% endif %}
+</div>
+
+{# -------------------------------------------------------------
+   TAB 6: EVENT COMPLETION REPORT
+   ------------------------------------------------------------- #}
+<div id="tab-report" class="hive-tab-pane">
+  <div class="hive-form-card" style="max-width: 840px; margin: 0 auto 30px;">
+    <h2 class="hive-table-title" style="margin-bottom: 8px;">📄 Event Completion Report Generator</h2>
+    <p style="font-size: 13px; color: var(--hive-text-muted); margin-bottom: 20px;">
+      Generate a comprehensive PDF completion report with statistics, feedback analysis, transcript summary, and gallery.
+    </p>
+
+    <form method="post" action="{{ url_for('generate_report', event_id=event['id']) }}" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="report_type" value="event_report">
+
+      <div class="form-grid">
+        <div class="field">
+          <label>Institute Name</label>
+          <input type="text" name="institute_name" value="Sri Ramakrishna Institute of Technology" required>
+        </div>
+        <div class="field">
+          <label>Department / Organizing Unit</label>
+          <input type="text" name="department" value="Department of Electrical and Electronics Engineering" required>
+        </div>
+        <div class="field">
+          <label>Speaker / Resource Person</label>
+          <input type="text" name="speaker_name" value="{{ event.get('speaker_name') or '' }}" required>
+        </div>
+        <div class="field">
+          <label>Faculty Coordinator Name</label>
+          <input type="text" name="coordinator" placeholder="e.g. Mr. A. Kumar, AP/EEE" required>
+        </div>
+        <div class="field">
+          <label>HOD Name</label>
+          <input type="text" name="hod" value="Dr. Head of Department" required>
+        </div>
+        <div class="field">
+          <label>Principal Name</label>
+          <input type="text" name="principal" value="Dr. Principal" required>
+        </div>
+        <div class="field">
+          <label>Program Type</label>
+          <input type="text" name="program_name" value="{{ event['program_name'] }}" required>
+        </div>
+        <div class="field">
+          <label>Upload Event Photos (Geo-Tagged)</label>
+          <input type="file" name="photos" multiple accept="image/*">
+        </div>
+        <div class="field full">
+          <label>Event Summary &amp; Highlights</label>
+          <textarea name="summary" placeholder="Write a brief narrative summary of the event execution, student engagement, and outcomes..." style="min-height: 120px;" required></textarea>
+        </div>
+      </div>
+      <br>
+      <button type="submit" class="btn btn-primary" style="padding: 10px 24px; font-size: 13.5px;">📄 Generate Event Completion Report</button>
+    </form>
+  </div>
+</div>
+
+{# -------------------------------------------------------------
+   TAB 7: SOP GENERATOR
+   ------------------------------------------------------------- #}
+<div id="tab-sop" class="hive-tab-pane">
+  <div class="hive-form-card" style="max-width: 860px; margin: 0 auto 30px;">
+    <h2 class="hive-table-title" style="margin-bottom: 8px;">📋 SOP – Application for Organizing Programme</h2>
+    <p style="font-size: 13px; color: var(--hive-text-muted); margin-bottom: 20px;">
+      Generate the official SRIT 15-item application PDF with institutional header and signature blocks.
+    </p>
+
+    <form method="post" action="{{ url_for('generate_report', event_id=event['id']) }}" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="report_type" value="sop_report">
+
+      <!-- ALL 7 LOGOS OPTIONAL CUSTOMIZATION SECTION -->
+      <input type="hidden" name="sop_logo_selection_active" value="1">
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h3 style="margin: 0 0 4px; font-size: 15px; font-weight: 700; color: var(--hive-text-title);">
+              🏛️ SOP Header &amp; Initiative Logos Customization
+            </h3>
+            <p style="margin: 0; font-size: 12.5px; color: var(--hive-text-muted);">
+              All 7 logos are individually optional. Check the logos you need for this SOP, or uncheck them to omit completely from the generated PDF. You can also upload custom logo replacements.
+            </p>
+          </div>
+          <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="btn btn-outline" style="font-size: 11.5px; padding: 4px 10px;" onclick="selectAllLogos(true)">
+              ✓ Select All (7)
+            </button>
+            <button type="button" class="btn btn-outline" style="font-size: 11.5px; padding: 4px 10px;" onclick="selectAllLogos(false)">
+              ✕ Deselect All
+            </button>
+            <button type="button" class="btn btn-outline" style="font-size: 11.5px; padding: 4px 10px;" onclick="resetAllSopLogos()">
+              🔄 Reset Uploads
+            </button>
+          </div>
+        </div>
+
+        <!-- 1. Top Header Institutional Logos (SNR & SRIT) -->
+        <div style="margin-bottom: 18px;">
+          <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--hive-navy-700); margin-bottom: 10px;">
+            1. Institutional Top Header Logos (Left &amp; Right)
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
+            <!-- SNR Logo Card -->
+            <div id="card_logo_snr" class="sop-logo-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 10px; transition: all 0.2s;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; font-weight: 700; color: #1e293b; margin: 0;">
+                  <input type="checkbox" name="include_logo_snr" id="include_logo_snr" checked onchange="toggleLogoCard('snr')">
+                  SNR Sons Trust (Top Left)
+                </label>
+                <span id="status_logo_snr" class="hive-badge-pill" style="font-size: 11px;">Included</span>
+              </div>
+              <div id="preview_box_snr" style="height: 65px; display: flex; align-items: center; justify-content: center; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 6px;">
+                <img id="preview_logo_snr" src="{{ url_for('static', filename='default_assets/logo_snr.png') }}" alt="SNR Logo" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+              </div>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="file" name="logo_snr" id="logo_input_snr" accept=".png,.jpg,.jpeg" style="display: none;" onchange="previewSopLogo(this, 'snr', '{{ url_for('static', filename='default_assets/logo_snr.png') }}')">
+                <button type="button" id="btn_upload_logo_snr" class="btn btn-secondary" style="flex: 1; padding: 6px 10px; font-size: 12px;" onclick="document.getElementById('logo_input_snr').click()">📁 Replace Logo</button>
+                <button type="button" id="reset_btn_logo_snr" class="btn btn-outline" style="display: none; padding: 6px 10px; font-size: 12px;" onclick="resetSopLogo('snr', '{{ url_for('static', filename='default_assets/logo_snr.png') }}')">✕ Reset</button>
+              </div>
+            </div>
+
+            <!-- SRIT Logo Card -->
+            <div id="card_logo_srit" class="sop-logo-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 10px; transition: all 0.2s;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; font-weight: 700; color: #1e293b; margin: 0;">
+                  <input type="checkbox" name="include_logo_srit" id="include_logo_srit" checked onchange="toggleLogoCard('srit')">
+                  SRIT Logo (Top Right)
+                </label>
+                <span id="status_logo_srit" class="hive-badge-pill" style="font-size: 11px;">Included</span>
+              </div>
+              <div id="preview_box_srit" style="height: 65px; display: flex; align-items: center; justify-content: center; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 6px;">
+                <img id="preview_logo_srit" src="{{ url_for('static', filename='default_assets/logo_srit.png') }}" alt="SRIT Logo" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+              </div>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="file" name="logo_srit" id="logo_input_srit" accept=".png,.jpg,.jpeg" style="display: none;" onchange="previewSopLogo(this, 'srit', '{{ url_for('static', filename='default_assets/logo_srit.png') }}')">
+                <button type="button" id="btn_upload_logo_srit" class="btn btn-secondary" style="flex: 1; padding: 6px 10px; font-size: 12px;" onclick="document.getElementById('logo_input_srit').click()">📁 Replace Logo</button>
+                <button type="button" id="reset_btn_logo_srit" class="btn btn-outline" style="display: none; padding: 6px 10px; font-size: 12px;" onclick="resetSopLogo('srit', '{{ url_for('static', filename='default_assets/logo_srit.png') }}')">✕ Reset</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Initiative Row Logos (Sub-Header) -->
+        <div>
+          <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--hive-navy-700); margin-bottom: 10px;">
+            2. Initiative Row Logos (Sub-Header)
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 12px;">
+            <!-- HIVE Logo Card -->
+            <div id="card_logo_hive" class="sop-logo-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; transition: all 0.2s;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; font-weight: 700; color: #1e293b; margin: 0;">
+                  <input type="checkbox" name="include_logo_hive" id="include_logo_hive" checked onchange="toggleLogoCard('hive')">
+                  HIVE
+                </label>
+                <span id="status_logo_hive" class="hive-badge-pill" style="font-size: 10px; padding: 2px 6px;">Included</span>
+              </div>
+              <div id="preview_box_hive" style="height: 50px; display: flex; align-items: center; justify-content: center; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 4px;">
+                <img id="preview_logo_hive" src="{{ url_for('static', filename='default_assets/logo_hive.png') }}" alt="HIVE" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+              </div>
+              <div style="display: flex; gap: 4px; align-items: center;">
+                <input type="file" name="logo_hive" id="logo_input_hive" accept=".png,.jpg,.jpeg" style="display: none;" onchange="previewSopLogo(this, 'hive', '{{ url_for('static', filename='default_assets/logo_hive.png') }}')">
+                <button type="button" id="btn_upload_logo_hive" class="btn btn-secondary" style="flex: 1; padding: 4px 6px; font-size: 11px;" onclick="document.getElementById('logo_input_hive').click()">Replace</button>
+                <button type="button" id="reset_btn_logo_hive" class="btn btn-outline" style="display: none; padding: 4px 6px; font-size: 11px;" onclick="resetSopLogo('hive', '{{ url_for('static', filename='default_assets/logo_hive.png') }}')">✕</button>
+              </div>
+            </div>
+
+            <!-- E-Cell Logo Card -->
+            <div id="card_logo_ecell" class="sop-logo-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; transition: all 0.2s;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; font-weight: 700; color: #1e293b; margin: 0;">
+                  <input type="checkbox" name="include_logo_ecell" id="include_logo_ecell" checked onchange="toggleLogoCard('ecell')">
+                  E-Cell
+                </label>
+                <span id="status_logo_ecell" class="hive-badge-pill" style="font-size: 10px; padding: 2px 6px;">Included</span>
+              </div>
+              <div id="preview_box_ecell" style="height: 50px; display: flex; align-items: center; justify-content: center; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 4px;">
+                <img id="preview_logo_ecell" src="{{ url_for('static', filename='default_assets/logo_ecell.png') }}" alt="E-Cell" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+              </div>
+              <div style="display: flex; gap: 4px; align-items: center;">
+                <input type="file" name="logo_ecell" id="logo_input_ecell" accept=".png,.jpg,.jpeg" style="display: none;" onchange="previewSopLogo(this, 'ecell', '{{ url_for('static', filename='default_assets/logo_ecell.png') }}')">
+                <button type="button" id="btn_upload_logo_ecell" class="btn btn-secondary" style="flex: 1; padding: 4px 6px; font-size: 11px;" onclick="document.getElementById('logo_input_ecell').click()">Replace</button>
+                <button type="button" id="reset_btn_logo_ecell" class="btn btn-outline" style="display: none; padding: 4px 6px; font-size: 11px;" onclick="resetSopLogo('ecell', '{{ url_for('static', filename='default_assets/logo_ecell.png') }}')">✕</button>
+              </div>
+            </div>
+
+            <!-- Idea Lab Logo Card -->
+            <div id="card_logo_idealab" class="sop-logo-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; transition: all 0.2s;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; font-weight: 700; color: #1e293b; margin: 0;">
+                  <input type="checkbox" name="include_logo_idealab" id="include_logo_idealab" checked onchange="toggleLogoCard('idealab')">
+                  Idea Lab
+                </label>
+                <span id="status_logo_idealab" class="hive-badge-pill" style="font-size: 10px; padding: 2px 6px;">Included</span>
+              </div>
+              <div id="preview_box_idealab" style="height: 50px; display: flex; align-items: center; justify-content: center; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 4px;">
+                <img id="preview_logo_idealab" src="{{ url_for('static', filename='default_assets/logo_idealab.png') }}" alt="Idea Lab" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+              </div>
+              <div style="display: flex; gap: 4px; align-items: center;">
+                <input type="file" name="logo_idealab" id="logo_input_idealab" accept=".png,.jpg,.jpeg" style="display: none;" onchange="previewSopLogo(this, 'idealab', '{{ url_for('static', filename='default_assets/logo_idealab.png') }}')">
+                <button type="button" id="btn_upload_logo_idealab" class="btn btn-secondary" style="flex: 1; padding: 4px 6px; font-size: 11px;" onclick="document.getElementById('logo_input_idealab').click()">Replace</button>
+                <button type="button" id="reset_btn_logo_idealab" class="btn btn-outline" style="display: none; padding: 4px 6px; font-size: 11px;" onclick="resetSopLogo('idealab', '{{ url_for('static', filename='default_assets/logo_idealab.png') }}')">✕</button>
+              </div>
+            </div>
+
+            <!-- IIC Logo Card -->
+            <div id="card_logo_iic" class="sop-logo-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; transition: all 0.2s;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; font-weight: 700; color: #1e293b; margin: 0;">
+                  <input type="checkbox" name="include_logo_iic" id="include_logo_iic" checked onchange="toggleLogoCard('iic')">
+                  IIC
+                </label>
+                <span id="status_logo_iic" class="hive-badge-pill" style="font-size: 10px; padding: 2px 6px;">Included</span>
+              </div>
+              <div id="preview_box_iic" style="height: 50px; display: flex; align-items: center; justify-content: center; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 4px;">
+                <img id="preview_logo_iic" src="{{ url_for('static', filename='default_assets/logo_iic.png') }}" alt="IIC" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+              </div>
+              <div style="display: flex; gap: 4px; align-items: center;">
+                <input type="file" name="logo_iic" id="logo_input_iic" accept=".png,.jpg,.jpeg" style="display: none;" onchange="previewSopLogo(this, 'iic', '{{ url_for('static', filename='default_assets/logo_iic.png') }}')">
+                <button type="button" id="btn_upload_logo_iic" class="btn btn-secondary" style="flex: 1; padding: 4px 6px; font-size: 11px;" onclick="document.getElementById('logo_input_iic').click()">Replace</button>
+                <button type="button" id="reset_btn_logo_iic" class="btn btn-outline" style="display: none; padding: 4px 6px; font-size: 11px;" onclick="resetSopLogo('iic', '{{ url_for('static', filename='default_assets/logo_iic.png') }}')">✕</button>
+              </div>
+            </div>
+
+            <!-- SISH Logo Card -->
+            <div id="card_logo_sish" class="sop-logo-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; transition: all 0.2s;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; font-weight: 700; color: #1e293b; margin: 0;">
+                  <input type="checkbox" name="include_logo_sish" id="include_logo_sish" checked onchange="toggleLogoCard('sish')">
+                  SISH
+                </label>
+                <span id="status_logo_sish" class="hive-badge-pill" style="font-size: 10px; padding: 2px 6px;">Included</span>
+              </div>
+              <div id="preview_box_sish" style="height: 50px; display: flex; align-items: center; justify-content: center; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 4px;">
+                <img id="preview_logo_sish" src="{{ url_for('static', filename='default_assets/logo_sish.png') }}" alt="SISH" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+              </div>
+              <div style="display: flex; gap: 4px; align-items: center;">
+                <input type="file" name="logo_sish" id="logo_input_sish" accept=".png,.jpg,.jpeg" style="display: none;" onchange="previewSopLogo(this, 'sish', '{{ url_for('static', filename='default_assets/logo_sish.png') }}')">
+                <button type="button" id="btn_upload_logo_sish" class="btn btn-secondary" style="flex: 1; padding: 4px 6px; font-size: 11px;" onclick="document.getElementById('logo_input_sish').click()">Replace</button>
+                <button type="button" id="reset_btn_logo_sish" class="btn btn-outline" style="display: none; padding: 4px 6px; font-size: 11px;" onclick="resetSopLogo('sish', '{{ url_for('static', filename='default_assets/logo_sish.png') }}')">✕</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label>1. Department / Association</label>
+          <input type="text" name="dept_assoc_club" value="{{ event.get('organizing_details') or ('HIVE, Department of ' ~ (event.get('program_name') or 'Engineering')) }}" required>
+        </div>
+        <div class="field">
+          <label>2. Nature of Programme</label>
+          <input type="text" name="nature_of_programme" value="{{ event.get('program_name') or '' }}" required>
+        </div>
+        <div class="field">
+          <label>4. Faculty Coordinator(s)</label>
+          <input type="text" name="coordinator" placeholder="e.g. Ms N Sanjana and Mr R Immanual" required>
+        </div>
+        <div class="field">
+          <label>SOP Date</label>
+          <input type="text" name="sop_date" placeholder="e.g. 24.07.2026">
+        </div>
+        <div class="field">
+          <label>HOD Name (Recommendation)</label>
+          <input type="text" name="hod" value="Dr. Head of Department" required>
+        </div>
+        <div class="field">
+          <label>Principal Name (Approval)</label>
+          <input type="text" name="principal" value="Dr. Principal" required>
+        </div>
+        <div class="field">
+          <label>8. Participants</label>
+          <input type="text" name="participants" value="Students (All Years)" required>
+        </div>
+        <div class="field">
+          <label>9. Total Audience Expected</label>
+          <input type="text" name="total_audience" value="{{ event.get('capacity') or '' }}" placeholder="e.g. 45 Internal">
+        </div>
+        <div class="field">
+          <label>10. Resource Person Name</label>
+          <input type="text" name="resource_person_name" value="{{ event.get('speaker_name') or '' }}">
+        </div>
+        <div class="field">
+          <label>Resource Person Designation</label>
+          <input type="text" name="resource_person_designation" value="{{ event.get('speaker_designation') or '' }}">
+        </div>
+        <div class="field">
+          <label>11. Estimated Expenditure</label>
+          <input type="text" name="estimated_expenditure" value="Rs {{ event.get('estimated_expenditure') or 'N/A' }}" required>
+        </div>
+        <div class="field">
+          <label>12. Fund Source</label>
+          <input type="text" name="fund_source" value="HOD's Fund" required>
+        </div>
+        <div class="field full">
+          <label>13. Programme Objective</label>
+          <textarea name="objective" style="min-height:90px;" required>{{ event.get('objectives') or '' }}</textarea>
+        </div>
+        <div class="field full">
+          <label>14. Contribution to Student Development</label>
+          <textarea name="student_contribution" style="min-height:90px;">{{ event.get('benefits') or '' }}</textarea>
+        </div>
+        <div class="field full">
+          <label>15. Contribution to Institution Brand</label>
+          <textarea name="institution_contribution" style="min-height:90px;" placeholder="Describe contribution to brand building..."></textarea>
+        </div>
+      </div>
+      <br>
+      <button type="submit" class="btn btn-dark" style="padding: 10px 24px; font-size: 13.5px;">📋 Generate Official SOP PDF</button>
+    </form>
+  </div>
+</div>
+
+{# -------------------------------------------------------------
+   TAB 8: STUDENT FEEDBACK
+   ------------------------------------------------------------- #}
+<div id="tab-feedback" class="hive-tab-pane">
+  <div class="hive-table-container">
+    <div class="hive-table-header-row">
+      <h2 class="hive-table-title">💬 Student Feedback ({{ feedback_list|length }})</h2>
+      <div style="font-size: 13px; font-weight: 700; color: var(--hive-gold-500);">
+        ⭐⭐⭐⭐⭐ 4.2 / 5 Overall Rating
+      </div>
+    </div>
+
+    {% if feedback_list %}
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        {% for fb in feedback_list %}
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid #edf1f3; padding-bottom: 8px;">
+              <div>
+                <strong style="font-size: 14px; color: var(--hive-text-title);">👤 {{ fb.get('student_name') or fb.get('user_name') or 'Student Innovator' }}</strong>
+                <span class="small" style="color: #64748b; margin-left: 8px;">{{ fb.get('submitted_at') or fb.get('created_at') or '' }}</span>
+              </div>
+              <span class="hive-badge-pill gold">
+                ⭐ {{ fb.get('q1_rating') or fb.get('rating') or 5 }} / 5
+              </span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 10px; font-size: 12.5px;">
+              <div style="background: #ffffff; padding: 8px 12px; border-radius: 8px; border: 1px solid #e8edf1;">
+                <strong>1. Overall Event Rating:</strong> {{ '⭐' * (fb.get('q1_rating') or fb.get('rating') or 5) }}
+              </div>
+              <div style="background: #ffffff; padding: 8px 12px; border-radius: 8px; border: 1px solid #e8edf1;">
+                <strong>2. Arrangements:</strong> {{ '⭐' * (fb.get('q2_rating') or 5) }}
+              </div>
+              <div style="background: #ffffff; padding: 8px 12px; border-radius: 8px; border: 1px solid #e8edf1;">
+                <strong>3. Usefulness:</strong> {{ '⭐' * (fb.get('q3_rating') or 5) }}
+              </div>
+              <div style="background: #ffffff; padding: 8px 12px; border-radius: 8px; border: 1px solid #e8edf1;">
+                <strong>4. What was best:</strong> {{ fb.get('q4_response') or fb.get('comments') or 'Good presentation and hands-on session.' }}
+              </div>
+              <div style="background: #ffffff; padding: 8px 12px; border-radius: 8px; border: 1px solid #e8edf1;">
+                <strong>5. Suggested improvements:</strong> {{ fb.get('q5_response') or 'Keep conducting more practical workshops.' }}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; color: var(--hive-text-muted); padding: 40px;">
+        <div style="font-size: 32px; margin-bottom: 8px;">💬</div>
+        <p style="margin: 0; font-size: 14px;">No student feedback submitted for this event yet.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{# View Transcript Modal #}
+<div id="transcript-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center; padding: 20px;">
+  <div style="width: 100%; max-width: 600px; background: white; border-radius: 16px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+    <h3 style="color:var(--hive-text-title); margin: 0 0 12px;">View Transcript</h3>
+    <textarea id="modal-transcript-text" readonly style="min-height: 240px; width: 100%; background: #f8fafc; border: 1px solid #dbe3e8; padding: 12px; border-radius: 10px; font-family: inherit; font-size: 13.5px; line-height: 1.6; outline: none;"></textarea>
+    <div style="display: flex; justify-content: flex-end; margin-top: 14px;">
+      <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+{# -------------------------------------------------------------
+   JAVASCRIPT: TABS, SPEECH RECORDER, AND FOOTER
+   ------------------------------------------------------------- #}
+<script>
+  function switchTab(tabId) {
+    document.querySelectorAll('.hive-tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
+    });
+    document.querySelectorAll('.hive-tab-pane').forEach(pane => {
+      pane.classList.toggle('active', pane.id === tabId);
+    });
+    if (history.pushState) {
+      history.pushState(null, null, '#' + tabId);
+    } else {
+      location.hash = '#' + tabId;
+    }
+  }
+
+  function scrollToCertSection() {
+    const el = document.getElementById('certificate-template-section');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+      const details = el.querySelector('details');
+      if (details) details.open = true;
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    // Handle initial hash in URL
+    const hash = window.location.hash.replace('#', '');
+    if (hash && document.getElementById(hash)) {
+      switchTab(hash);
+    }
+
+    // Voice Recorder
+    let recognition = null;
+    let recordingInterval = null;
+    let secondsElapsed = 0;
+    let mediaStream = null;
+
+    const btnStart = document.getElementById('btn-start');
+    const btnStop = document.getElementById('btn-stop');
+    const btnClear = document.getElementById('btn-clear');
+    const transcriptArea = document.getElementById('transcript-area');
+    const statusBadge = document.getElementById('recording-status');
+    const durationSpan = document.getElementById('recording-duration');
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    function updateDurationDisplay() {
+      if (!durationSpan) return;
+      const mins = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+      const secs = (secondsElapsed % 60).toString().padStart(2, '0');
+      durationSpan.textContent = mins + ':' + secs;
+    }
+
+    if (btnStart) {
+      btnStart.addEventListener('click', async function() {
+        try {
+          mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          if (!SpeechRecognition) {
+            alert("Speech Recognition API is not supported in this browser. Please use Chrome or Edge.");
+            mediaStream.getTracks().forEach(track => track.stop());
+            return;
+          }
+          recognition = new SpeechRecognition();
+          recognition.continuous = true;
+          recognition.interimResults = true;
+          let baseText = transcriptArea.value;
+
+          recognition.onresult = function(event) {
+            let sessionFinal = '';
+            let sessionInterim = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+              if (event.results[i].isFinal) sessionFinal += event.results[i][0].transcript + ' ';
+              else sessionInterim += event.results[i][0].transcript;
+            }
+            const combinedSession = (sessionFinal + sessionInterim).trim();
+            transcriptArea.value = baseText ? baseText + '\n' + combinedSession : combinedSession;
+          };
+
+          recognition.start();
+          statusBadge.textContent = 'Recording';
+          statusBadge.className = 'hive-badge-pill green';
+          btnStart.disabled = true;
+          btnStop.disabled = false;
+          secondsElapsed = 0;
+          updateDurationDisplay();
+          recordingInterval = setInterval(() => {
+            secondsElapsed++;
+            updateDurationDisplay();
+          }, 1000);
+        } catch (err) {
+          alert("Microphone permission required.");
+        }
+      });
+    }
+
+    if (btnStop) {
+      btnStop.addEventListener('click', function() {
+        if (recognition) { recognition.onend = null; recognition.stop(); }
+        if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+        if (recordingInterval) { clearInterval(recordingInterval); recordingInterval = null; }
+        statusBadge.textContent = 'Stopped';
+        statusBadge.className = 'hive-badge-pill gold';
+        btnStart.disabled = false;
+        btnStop.disabled = true;
+      });
+    }
+
+    if (btnClear) {
+      btnClear.addEventListener('click', function() {
+        if (confirm("Clear transcript?")) {
+          transcriptArea.value = '';
+          secondsElapsed = 0;
+          updateDurationDisplay();
+          statusBadge.textContent = 'Idle';
+          statusBadge.className = 'hive-badge-pill gold';
+        }
+      });
+    }
+  });
+
+  function validateFileSize(input, maxMb) {
+    if (input.files && input.files[0]) {
+      var file = input.files[0];
+      if (file.size > maxMb * 1024 * 1024) {
+        alert("File '" + file.name + "' exceeds maximum size of " + maxMb + " MB.");
+        input.value = "";
+      }
+    }
+  }
+
+  function viewTranscript(text) {
+    document.getElementById('modal-transcript-text').value = text;
+    document.getElementById('transcript-modal').style.display = 'flex';
+  }
+
+  function closeModal() {
+    document.getElementById('transcript-modal').style.display = 'none';
+  }
+
+  // -------------------------------------------------------------
+  // SOP LOGOS (ALL 7 LOGOS: SNR, SRIT, HIVE, E-Cell, Idea Lab, IIC, SISH)
+  // -------------------------------------------------------------
+  const SOP_DEFAULT_LOGOS = {
+    snr: "{{ url_for('static', filename='default_assets/logo_snr.png') }}",
+    srit: "{{ url_for('static', filename='default_assets/logo_srit.png') }}",
+    hive: "{{ url_for('static', filename='default_assets/logo_hive.png') }}",
+    ecell: "{{ url_for('static', filename='default_assets/logo_ecell.png') }}",
+    idealab: "{{ url_for('static', filename='default_assets/logo_idealab.png') }}",
+    iic: "{{ url_for('static', filename='default_assets/logo_iic.png') }}",
+    sish: "{{ url_for('static', filename='default_assets/logo_sish.png') }}"
+  };
+
+  const ALL_SOP_LOGO_KEYS = ['snr', 'srit', 'hive', 'ecell', 'idealab', 'iic', 'sish'];
+
+  function toggleLogoCard(key) {
+    const checkbox = document.getElementById('include_logo_' + key);
+    const card = document.getElementById('card_logo_' + key);
+    const statusEl = document.getElementById('status_logo_' + key);
+    const uploadBtn = document.getElementById('btn_upload_logo_' + key);
+    const isChecked = checkbox && checkbox.checked;
+
+    if (card) {
+      if (isChecked) {
+        card.style.opacity = '1';
+        card.style.background = '#ffffff';
+      } else {
+        card.style.opacity = '0.45';
+        card.style.background = '#f1f5f9';
+      }
+    }
+
+    if (statusEl) {
+      if (isChecked) {
+        const input = document.getElementById('logo_input_' + key);
+        if (input && input.files && input.files.length > 0) {
+          statusEl.textContent = 'Custom';
+          statusEl.className = 'hive-badge-pill green';
+        } else {
+          statusEl.textContent = 'Included';
+          statusEl.className = 'hive-badge-pill';
+        }
+      } else {
+        statusEl.textContent = 'Omitted';
+        statusEl.className = 'hive-badge-pill gold';
+      }
+    }
+
+    if (uploadBtn) {
+      uploadBtn.disabled = !isChecked;
+    }
+  }
+
+  function selectAllLogos(select) {
+    for (const key of ALL_SOP_LOGO_KEYS) {
+      const cb = document.getElementById('include_logo_' + key);
+      if (cb) {
+        cb.checked = select;
+        toggleLogoCard(key);
+      }
+    }
+  }
+
+  function previewSopLogo(input, key, defaultSrc) {
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const previewImg = document.getElementById('preview_logo_' + key);
+      const statusEl = document.getElementById('status_logo_' + key);
+      const resetBtn = document.getElementById('reset_btn_logo_' + key);
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        if (previewImg) previewImg.src = e.target.result;
+        if (statusEl) {
+          statusEl.textContent = 'Custom';
+          statusEl.className = 'hive-badge-pill green';
+          statusEl.title = file.name;
+        }
+        if (resetBtn) resetBtn.style.display = 'inline-block';
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function resetSopLogo(key, defaultSrc) {
+    const input = document.getElementById('logo_input_' + key);
+    const previewImg = document.getElementById('preview_logo_' + key);
+    const statusEl = document.getElementById('status_logo_' + key);
+    const resetBtn = document.getElementById('reset_btn_logo_' + key);
+    const checkbox = document.getElementById('include_logo_' + key);
+
+    if (input) input.value = '';
+    if (previewImg) previewImg.src = defaultSrc || SOP_DEFAULT_LOGOS[key];
+    if (statusEl) {
+      if (checkbox && checkbox.checked) {
+        statusEl.textContent = 'Included';
+        statusEl.className = 'hive-badge-pill';
+      } else {
+        statusEl.textContent = 'Omitted';
+        statusEl.className = 'hive-badge-pill gold';
+      }
+      statusEl.title = '';
+    }
+    if (resetBtn) resetBtn.style.display = 'none';
+  }
+
+  function resetAllSopLogos() {
+    for (const key of ALL_SOP_LOGO_KEYS) {
+      resetSopLogo(key, SOP_DEFAULT_LOGOS[key]);
+    }
+  }
+</script>
+{% endblock %}

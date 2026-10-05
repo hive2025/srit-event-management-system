@@ -1,0 +1,184 @@
+﻿{% extends "base.html" %}
+{% block title %}{{ event['title'] }} - Report | SRIT HIVE{% endblock %}
+
+{% block content %}
+<div class="section-head">
+  <div>
+    <h2>Event Analytics &amp; Completion Report</h2>
+    <div class="section-sub">{{ event['title'] }} &bull; Comprehensive participant metrics &amp; feedback analysis</div>
+  </div>
+  <div style="display:flex; gap: 8px;">
+    <a class="btn btn-secondary" href="{{ url_for('event_detail', event_id=event['id']) }}">&larr; View Event</a>
+    <a class="btn btn-dark" href="{{ url_for('manage_event', event_id=event['id']) }}">Manage Event &rarr;</a>
+  </div>
+</div>
+
+<!-- 4 KPI Metrics -->
+<div class="stats">
+  <div class="stat">
+    <div style="font-size:1.8rem; line-height:1;">👥</div>
+    <div>
+      <div class="number">{{ total_registrations }}</div>
+      <div class="label">Total Registrations</div>
+    </div>
+  </div>
+  <div class="stat">
+    <div style="font-size:1.8rem; line-height:1;">💬</div>
+    <div>
+      <div class="number">{{ total_feedback }}</div>
+      <div class="label">Feedback Received</div>
+    </div>
+  </div>
+  <div class="stat">
+    <div style="font-size:1.8rem; line-height:1;">⭐</div>
+    <div>
+      <div class="number">{{ avg_rating }} / 5</div>
+      <div class="label">Average Rating</div>
+    </div>
+  </div>
+  <div class="stat">
+    <div style="font-size:1.8rem; line-height:1;">🎙️</div>
+    <div>
+      <div class="number">{{ transcripts|length }}</div>
+      <div class="label">AI Transcripts</div>
+    </div>
+  </div>
+</div>
+
+<!-- 2-Col Overview & Updates -->
+<div class="grid-2" style="margin-bottom: 28px;">
+  <div class="card">
+    <h3 style="color:var(--hive-text-title); margin-bottom: 14px;">📋 Event Overview</h3>
+    <div style="display:flex; flex-direction:column; gap: 10px; font-size: 0.85rem;">
+      <div><strong>Program Name:</strong> <span style="color:var(--hive-text-muted)">{{ event.get('program_name') or 'N/A' }}</span></div>
+      <div><strong>Academic Year:</strong> <span style="color:var(--hive-text-muted)">{{ event.get('academic_year') or 'N/A' }}</span></div>
+      <div><strong>Venue:</strong> <span style="color:var(--hive-text-muted)">{{ event.get('venue') or 'N/A' }}</span></div>
+      <div><strong>Date:</strong> <span style="color:var(--hive-text-muted)">{{ event.get('event_date') or 'N/A' }}</span></div>
+      <div>
+        <strong>Status:</strong> 
+        {% set st = (event.get('status') or 'Upcoming')|lower %}
+        {% if st == 'completed' %}<span class="badge green">Completed</span>
+        {% elif st == 'upcoming' %}<span class="badge gold">Upcoming</span>
+        {% else %}<span class="badge teal">{{ event.get('status') or 'Open' }}</span>{% endif %}
+      </div>
+      <div><strong>Description:</strong> <span style="color:var(--hive-text-body)">{{ event.get('description') or 'No description provided.' }}</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--hive-text-title); margin-bottom: 14px;">📢 Announcements &amp; Updates ({{ updates|length }})</h3>
+    <div style="display:flex; flex-direction:column; gap: 10px;">
+      {% for u in updates %}
+        <div style="border-bottom: 1px solid var(--hive-border-subtle); padding-bottom: 8px;">
+          <div style="font-weight:700; font-size:0.85rem; color:var(--hive-text-title);">📌 {{ u.get('title') or u.get('message') }}</div>
+          {% if u.get('title') and u.get('message') %}
+            <div style="font-size:0.8rem; color:var(--hive-text-body); margin: 2px 0;">{{ u.get('message') }}</div>
+          {% endif %}
+          <div class="small">{{ u.get('created_at') }}</div>
+        </div>
+      {% else %}
+        <p class="small" style="color:var(--hive-text-muted);">No updates posted for this event.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Registered Participants Table -->
+<div class="section-head">
+  <div>
+    <h2>Registered Participants ({{ registrations|length }})</h2>
+    <div class="section-sub">Attendance status and certificate distribution</div>
+  </div>
+</div>
+
+<div class="table-wrap" style="margin-bottom: 36px;">
+  <table>
+    <thead>
+      <tr>
+        <th>Participant</th>
+        <th>Department</th>
+        <th>Registered At</th>
+        <th>Attendance</th>
+        <th>Certificate</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in registrations %}
+      <tr>
+        <td>
+          <div style="font-weight:700; color:var(--hive-text-title);">{{ r.get('student_name') or r.get('user_name') or r.get('student_id') }}</div>
+          <div class="small">{{ r.get('student_email') or r.get('user_email') or '' }}</div>
+        </td>
+        <td>{{ r.get('department') or 'N/A' }}</td>
+        <td>{{ r.get('registered_at') or 'N/A' }}</td>
+        <td>
+          {% if r.get('attendance') or r.get('attendance_status') in ['present', 'attended'] %}
+            <span class="badge green">Attended</span>
+          {% elif r.get('attendance_status') == 'absent' %}
+            <span class="badge red">Absent</span>
+          {% else %}
+            <span class="badge gold">Pending</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if r.get('certificate_file') %}
+            <span class="badge teal">{{ r.get('certificate_type') or 'Issued' }}</span>
+          {% else %}
+            <span class="small" style="color:var(--hive-text-muted)">None</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="5" class="empty" style="text-align:center; padding: 32px;">
+          No participants registered yet.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Participant Feedback Cards Grid -->
+<div class="section-head">
+  <div>
+    <h2>Participant Feedback ({{ feedback_list|length }})</h2>
+    <div class="section-sub">Ratings and qualitative remarks from attendees</div>
+  </div>
+</div>
+
+<div class="grid-2">
+  {% for f in feedback_list %}
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+      <div style="font-weight:800; color:var(--hive-text-title); font-size:0.95rem;">
+        👤 {{ f.get('user_name') or 'Anonymous Attendee' }}
+      </div>
+      <span class="badge gold">★ {{ f.get('rating') or f.get('q1_rating') or 5 }} / 5</span>
+    </div>
+    
+    {% if f.get('q4_response') %}
+      <div style="font-size:0.82rem; color:var(--hive-text-body); margin: 6px 0;">
+        <strong>Liked:</strong> {{ f.get('q4_response') }}
+      </div>
+    {% endif %}
+    
+    {% if f.get('q5_response') %}
+      <div style="font-size:0.82rem; color:var(--hive-text-body); margin: 6px 0;">
+        <strong>Suggestions:</strong> {{ f.get('q5_response') }}
+      </div>
+    {% endif %}
+
+    {% if f.get('comments') and not f.get('q4_response') %}
+      <p style="font-size:0.82rem; color:var(--hive-text-body); margin: 6px 0;">{{ f.get('comments') }}</p>
+    {% endif %}
+
+    <div class="small" style="margin-top: 8px;">{{ f.get('created_at') or f.get('submitted_at') or '' }}</div>
+  </div>
+  {% else %}
+  <div class="card" style="grid-column: 1 / -1; text-align:center; padding: 32px;">
+    <p class="small">No feedback submitted for this event yet.</p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,770 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | SRIT HIVE{% endblock %}
+
+{% block content %}
+<style>
+/* ── SRIT HIVE Design Tokens ────────────────────────────────────────── */
+:root {
+  --hive-dark-navy:  #051d2d;
+  --hive-navy-900:   #07253b;
+  --hive-navy-700:   #0d466c;
+  --hive-navy-500:   #1a6a9a;
+  --hive-teal-600:   #0d8b8b;
+  --hive-teal-500:   #14b8a6;
+  --hive-green-500:  #10b981;
+  --hive-gold-400:   #fbb03b;
+  --hive-gold-500:   #f59e0b;
+  --hive-bg:         #f4f7f9;
+  --hive-surface:    #ffffff;
+  --hive-border:     #e2e8f0;
+  --hive-text-title: #07253b;
+  --hive-text-body:  #475569;
+  --hive-text-muted: #64748b;
+}
+
+/* ── Base resets ─────────────────────────────────────────────────────── */
+.container { max-width: 1240px !important; padding: 0 20px 60px !important; }
+body { background: var(--hive-bg) !important; }
+
+/* ── Page wrapper ────────────────────────────────────────────────────── */
+.sd-page { background: var(--hive-bg); min-height: calc(100vh - 64px); }
+
+/* ── HERO ────────────────────────────────────────────────────────────── */
+.sd-hero {
+  margin-top: 14px;
+  margin-bottom: 24px;
+  border-radius: 20px;
+  background: linear-gradient(115deg, #031a2b 0%, #06314c 35%, #0a4f73 70%, #0d6385 100%);
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 16px 36px -10px rgba(5, 29, 45, 0.35);
+  min-height: 240px;
+  display: flex;
+  align-items: center;
+}
+
+/* Campus image — right-panel, masked, matching faculty */
+.sd-hero-building-bg {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 52%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.15) 15%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,1) 85%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.15) 15%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,1) 85%);
+}
+.sd-hero-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center 30%;
+  filter: contrast(1.06) brightness(0.92);
+}
+
+/* Gradient overlay — left-to-right fade matching faculty */
+.sd-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, #031a2b 0%, rgba(3, 26, 43, 0.45) 30%, transparent 75%),
+              linear-gradient(to top, rgba(3, 26, 43, 0.45) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+/* Dot grid accent — top-left */
+.sd-hero-dots {
+  position: absolute;
+  top: 20px;
+  left: 28px;
+  width: 80px;
+  height: 50px;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.22) 1.5px, transparent 1.5px);
+  background-size: 12px 12px;
+  pointer-events: none;
+}
+
+/* Diagonal gold streak */
+.sd-hero-gold-slash {
+  position: absolute;
+  bottom: 25px;
+  left: 280px;
+  width: 140px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--hive-gold-400), rgba(251, 176, 59, 0.1));
+  transform: rotate(-25deg);
+  pointer-events: none;
+}
+
+.sd-hero-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 36px 40px;
+  max-width: 620px;
+}
+.sd-hero-eyebrow {
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--hive-teal-500);
+  margin-bottom: .6rem;
+}
+.sd-hero-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.1;
+  margin: 0 0 .6rem;
+  letter-spacing: -.02em;
+}
+.sd-hero-title span { color: var(--hive-gold-400); }
+.sd-hero-sub {
+  font-size: .9rem;
+  color: #94b8cc;
+  line-height: 1.55;
+  margin-bottom: 1.5rem;
+  max-width: 440px;
+}
+.sd-hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  background: var(--hive-gold-400);
+  color: var(--hive-dark-navy);
+  font-size: .85rem;
+  font-weight: 700;
+  padding: .6rem 1.3rem;
+  border-radius: 8px;
+  text-decoration: none;
+  letter-spacing: .04em;
+  transition: background .2s, transform .15s;
+}
+.sd-hero-cta:hover { background: var(--hive-gold-500); transform: translateY(-1px); }
+
+/* ── MAIN CONTENT ────────────────────────────────────────────────────── */
+.sd-content {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── KPI CARDS ───────────────────────────────────────────────────────── */
+.sd-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2.25rem;
+}
+.sd-kpi {
+  background: var(--hive-surface);
+  border: 1px solid var(--hive-border);
+  border-radius: 14px;
+  padding: 1.25rem 1.35rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  box-shadow: 0 2px 10px rgba(5,29,45,.06);
+  transition: box-shadow .2s, transform .2s;
+  text-decoration: none;
+}
+.sd-kpi:hover { box-shadow: 0 6px 22px rgba(5,29,45,.11); transform: translateY(-2px); }
+.sd-kpi-icon {
+  width: 44px; height: 44px;
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.sd-kpi-icon.navy  { background: rgba(7,37,59,.1); }
+.sd-kpi-icon.teal  { background: rgba(13,139,139,.12); }
+.sd-kpi-icon.green { background: rgba(16,185,129,.12); }
+.sd-kpi-icon.gold  { background: rgba(251,176,59,.14); }
+.sd-kpi-body { min-width: 0; }
+.sd-kpi-num {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--hive-text-title);
+  line-height: 1;
+  margin-bottom: .2rem;
+}
+.sd-kpi-label {
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--hive-text-title);
+  margin-bottom: .15rem;
+}
+.sd-kpi-hint {
+  font-size: .7rem;
+  color: var(--hive-text-muted);
+}
+.sd-kpi-arrow {
+  margin-left: auto;
+  font-size: .8rem;
+  color: var(--hive-teal-600);
+  align-self: center;
+  flex-shrink: 0;
+}
+
+/* ── CERTIFICATES SECTION ────────────────────────────────────────────── */
+.sd-section {
+  background: var(--hive-surface);
+  border: 1px solid var(--hive-border);
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(5,29,45,.06);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+.sd-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--hive-border);
+}
+.sd-section-title-row {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+}
+.sd-section-icon {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  background: rgba(13,139,139,.12);
+  flex-shrink: 0;
+}
+.sd-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--hive-text-title);
+  margin: 0;
+}
+.sd-section-sub {
+  font-size: .75rem;
+  color: var(--hive-text-muted);
+  margin: .15rem 0 0;
+}
+.sd-view-all {
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--hive-teal-600);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+  padding: .35rem .7rem;
+  border-radius: 6px;
+  border: 1px solid rgba(13,139,139,.25);
+  transition: background .18s, color .18s;
+}
+.sd-view-all:hover { background: rgba(13,139,139,.08); }
+
+/* Cert cards grid */
+.sd-cert-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+}
+.sd-cert-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #f8fafc;
+  border: 1px solid var(--hive-border);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+}
+.sd-cert-thumb {
+  width: 48px; height: 48px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--hive-navy-700), var(--hive-teal-600));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.sd-cert-info { flex: 1; min-width: 0; }
+.sd-cert-name {
+  font-size: .88rem;
+  font-weight: 700;
+  color: var(--hive-text-title);
+  line-height: 1.3;
+  margin-bottom: .3rem;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sd-cert-meta {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  flex-wrap: wrap;
+}
+.sd-cert-date { font-size: .72rem; color: var(--hive-text-muted); }
+.sd-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: .15rem .55rem;
+  border-radius: 20px;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+}
+.sd-badge.green  { background: #d1fae5; color: #065f46; }
+.sd-badge.teal   { background: #ccfbf1; color: #0d6f5f; }
+.sd-badge.blue   { background: #dbeafe; color: #1d4ed8; }
+.sd-badge.gold   { background: #fef3c7; color: #92400e; }
+.sd-badge.red    { background: #fee2e2; color: #b91c1c; }
+.sd-badge.gray   { background: #f1f5f9; color: #64748b; }
+.sd-cert-dl {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--hive-teal-600);
+  background: rgba(13,139,139,.08);
+  border: 1px solid rgba(13,139,139,.22);
+  border-radius: 7px;
+  padding: .35rem .7rem;
+  text-decoration: none;
+  transition: background .18s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.sd-cert-dl:hover { background: rgba(13,139,139,.16); }
+
+/* ── BOTTOM TWO-COLUMN ────────────────────────────────────────────────── */
+.sd-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* ── MY EVENTS TABLE ─────────────────────────────────────────────────── */
+.sd-events-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.sd-events-table thead tr {
+  border-bottom: 2px solid var(--hive-border);
+}
+.sd-events-table th {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--hive-text-muted);
+  padding: .75rem 1rem;
+  text-align: left;
+  white-space: nowrap;
+}
+.sd-events-table td {
+  padding: .85rem 1rem;
+  font-size: .85rem;
+  color: var(--hive-text-body);
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+.sd-events-table tbody tr:last-child td { border-bottom: none; }
+.sd-events-table tbody tr:hover td { background: #f8fafc; }
+.sd-event-name {
+  font-weight: 700;
+  color: var(--hive-text-title);
+  font-size: .88rem;
+  text-decoration: none;
+  display: block;
+  line-height: 1.3;
+}
+.sd-event-name:hover { color: var(--hive-teal-600); }
+.sd-event-venue {
+  font-size: .72rem;
+  color: var(--hive-text-muted);
+  margin-top: .2rem;
+  display: flex;
+  align-items: center;
+  gap: .2rem;
+}
+.sd-event-date-col { font-size: .82rem; color: var(--hive-text-body); white-space: nowrap; }
+.sd-cert-action-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--hive-teal-600);
+  background: rgba(13,139,139,.08);
+  border: 1px solid rgba(13,139,139,.22);
+  border-radius: 6px;
+  padding: .3rem .6rem;
+  text-decoration: none;
+  transition: background .15s;
+}
+.sd-cert-action-link:hover { background: rgba(13,139,139,.16); }
+.sd-cert-na { font-size: .75rem; color: var(--hive-text-muted); }
+.sd-empty-row td {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--hive-text-muted);
+  font-size: .88rem;
+}
+.sd-empty-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: .75rem;
+  opacity: .4;
+}
+
+/* ── ROW DETAIL LINK ─────────────────────────────────────────────────── */
+.sd-row-link {
+  color: #cbd5e1;
+  font-size: .8rem;
+  text-decoration: none;
+}
+.sd-row-link:hover { color: var(--hive-teal-500); }
+
+/* ── LATEST UPDATES PANEL ────────────────────────────────────────────── */
+.sd-updates-body { padding: 1.1rem 1.25rem; }
+.sd-update-item {
+  padding: .9rem 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.sd-update-item:last-child { border-bottom: none; }
+.sd-update-title {
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--hive-text-title);
+  margin-bottom: .25rem;
+}
+.sd-update-msg { font-size: .8rem; color: var(--hive-text-body); line-height: 1.5; margin-bottom: .3rem; }
+.sd-update-meta { font-size: .7rem; color: var(--hive-text-muted); }
+
+/* Empty state for updates */
+.sd-updates-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+.sd-updates-empty-icon {
+  width: 64px; height: 64px;
+  border-radius: 16px;
+  background: #f1f5f9;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+.sd-updates-empty-title {
+  font-size: .9rem;
+  font-weight: 700;
+  color: var(--hive-text-title);
+  margin-bottom: .35rem;
+}
+.sd-updates-empty-sub { font-size: .78rem; color: var(--hive-text-muted); }
+
+/* ── RESPONSIVE ──────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .sd-kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .sd-bottom-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .sd-hero {
+    min-height: auto;
+  }
+  .sd-hero-building-bg {
+    opacity: 0.2;
+    width: 100%;
+  }
+  .sd-hero-content {
+    padding: 28px 20px;
+    max-width: 100%;
+  }
+  .sd-hero-title {
+    font-size: 26px;
+  }
+}
+@media (max-width: 640px) {
+  .sd-kpi-row { grid-template-columns: 1fr 1fr; }
+  .sd-hero-title { font-size: 1.55rem; }
+  .sd-hero-gold-slash { display: none; }
+  .sd-hero-dots { display: none; }
+  /* Table → card on mobile */
+  .sd-events-table thead { display: none; }
+  .sd-events-table tbody tr {
+    display: block;
+    background: var(--hive-surface);
+    border: 1px solid var(--hive-border);
+    border-radius: 12px;
+    margin-bottom: .75rem;
+    padding: .75rem 1rem;
+  }
+  .sd-events-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .4rem 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: .82rem;
+  }
+  .sd-events-table td:last-child { border-bottom: none; }
+  .sd-events-table td::before {
+    content: attr(data-label);
+    font-size: .67rem;
+    font-weight: 700;
+    color: var(--hive-text-muted);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    margin-right: .5rem;
+    flex-shrink: 0;
+  }
+}
+</style>
+
+<div class="sd-page">
+
+  <!-- ══ HERO ═══════════════════════════════════════════════════════════ -->
+  <section class="sd-hero">
+    <div class="sd-hero-dots"></div>
+    <div class="sd-hero-gold-slash"></div>
+
+    <div class="sd-hero-building-bg">
+      <img class="sd-hero-img"
+           src="{{ url_for('static', filename='images/srit_campus.jpg') }}"
+           alt="Sri Ramakrishna Institute of Technology"
+           loading="eager">
+      <div class="sd-hero-overlay"></div>
+    </div>
+
+    <div class="sd-hero-content">
+      <div class="sd-hero-eyebrow">WELCOME BACK,</div>
+      <h1 class="sd-hero-title">
+        {{ (user.name or user.get('name') or user.get('display_name') or 'Student') | title }} 👋
+      </h1>
+      <p class="sd-hero-sub">
+        Your HIVE activity at a glance.<br>
+        Track your registrations, participation, certificates and event activity from one place.
+      </p>
+      <a href="{{ url_for('events') }}" class="sd-hero-cta">
+        Explore Events &rarr;
+      </a>
+    </div>
+  </section>
+
+  <!-- ══ MAIN CONTENT ═══════════════════════════════════════════════════ -->
+  <div class="sd-content">
+
+    <!-- ── KPI Row ──────────────────────────────────────────────────── -->
+    <div class="sd-kpi-row">
+      <div class="sd-kpi">
+        <div class="sd-kpi-icon navy">📋</div>
+        <div class="sd-kpi-body">
+          <div class="sd-kpi-num">{{ stats.registered }}</div>
+          <div class="sd-kpi-label">Registered Events</div>
+          <div class="sd-kpi-hint">Track you have registered for</div>
+        </div>
+        <span class="sd-kpi-arrow">›</span>
+      </div>
+      <div class="sd-kpi">
+        <div class="sd-kpi-icon teal">👥</div>
+        <div class="sd-kpi-body">
+          <div class="sd-kpi-num">{{ stats.attended }}</div>
+          <div class="sd-kpi-label">Events Attended</div>
+          <div class="sd-kpi-hint">Events you have participated in</div>
+        </div>
+        <span class="sd-kpi-arrow">›</span>
+      </div>
+      <div class="sd-kpi">
+        <div class="sd-kpi-icon green">🎓</div>
+        <div class="sd-kpi-body">
+          <div class="sd-kpi-num">{{ stats.certificates }}</div>
+          <div class="sd-kpi-label">Certificates Earned</div>
+          <div class="sd-kpi-hint">Download your certificates</div>
+        </div>
+        <span class="sd-kpi-arrow">›</span>
+      </div>
+      <div class="sd-kpi">
+        <div class="sd-kpi-icon gold">💬</div>
+        <div class="sd-kpi-body">
+          <div class="sd-kpi-num">{{ stats.feedback }}</div>
+          <div class="sd-kpi-label">Feedback Submitted</div>
+          <div class="sd-kpi-hint">Your feedback counts</div>
+        </div>
+        <span class="sd-kpi-arrow">›</span>
+      </div>
+    </div>
+
+    <!-- ── Certificates Section ─────────────────────────────────────── -->
+    {% if certificates %}
+    <div class="sd-section" style="margin-bottom:1.5rem">
+      <div class="sd-section-header">
+        <div class="sd-section-title-row">
+          <div class="sd-section-icon">🎓</div>
+          <div>
+            <div class="sd-section-title">My Certificates</div>
+            <div class="sd-section-sub">Your participation achievements and downloadable certificates.</div>
+          </div>
+        </div>
+        <a href="#" class="sd-view-all">View All &rsaquo;</a>
+      </div>
+      <div class="sd-cert-grid">
+        {% for cert in certificates %}
+        <div class="sd-cert-card">
+          <div class="sd-cert-thumb">🎖️</div>
+          <div class="sd-cert-info">
+            <div class="sd-cert-name" title="{{ cert.event_title or cert.title or 'Event Certificate' }}">
+              {{ cert.event_title or cert.title or 'Event Certificate' }}
+            </div>
+            <div class="sd-cert-meta">
+              <span class="sd-cert-date">📅 {{ cert.event_date or 'Event Date' }}</span>
+              <span class="sd-badge green">{{ cert.certificate_type or 'Participation' }}</span>
+            </div>
+          </div>
+          <a class="sd-cert-dl"
+             href="{{ url_for('download_certificate', filename=cert.certificate_file or cert.filename) }}">
+            ⬇ Download
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- ── Bottom grid: My Events + Latest Updates ──────────────────── -->
+    <div class="sd-bottom-grid">
+
+      <!-- My Events -->
+      <div class="sd-section">
+        <div class="sd-section-header">
+          <div class="sd-section-title-row">
+            <div class="sd-section-icon" style="background:rgba(7,37,59,.1)">📅</div>
+            <div>
+              <div class="sd-section-title">My Events</div>
+              <div class="sd-section-sub">Your registered events, participation status and certificates.</div>
+            </div>
+          </div>
+        </div>
+
+        <table class="sd-events-table">
+          <thead>
+            <tr>
+              <th>Event</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Attendance</th>
+              <th>Certificate</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in registrations %}
+            <tr>
+              <td data-label="Event">
+                <a class="sd-event-name"
+                   href="{{ url_for('event_detail', event_id=r['event_id']) }}">
+                  {{ r['title'] }}
+                </a>
+                {% if r.get('venue') %}
+                <div class="sd-event-venue">📍 {{ r['venue'] }}</div>
+                {% endif %}
+              </td>
+              <td data-label="Date" class="sd-event-date-col">{{ r['event_date'] }}</td>
+              <td data-label="Status">
+                {% set st = (r.get('status') or '') | lower %}
+                {% if st == 'completed' %}
+                  <span class="sd-badge green">Completed</span>
+                {% elif st == 'upcoming' %}
+                  <span class="sd-badge blue">Upcoming</span>
+                {% elif st == 'open' %}
+                  <span class="sd-badge gold">Open</span>
+                {% elif st == 'cancelled' %}
+                  <span class="sd-badge red">Cancelled</span>
+                {% else %}
+                  <span class="sd-badge gray">{{ r.get('status') or '—' }}</span>
+                {% endif %}
+              </td>
+              <td data-label="Attendance">
+                {% if r['attendance_status'] == 'present' or r['attendance'] == 1 %}
+                  <span class="sd-badge green">Present</span>
+                {% elif r['attendance_status'] == 'absent' %}
+                  <span class="sd-badge red">Absent</span>
+                {% else %}
+                  <span class="sd-badge gold">Pending</span>
+                {% endif %}
+              </td>
+              <td data-label="Certificate">
+                {% if (r['attendance_status'] == 'present' or r['attendance'] == 1) and r['certificate_file'] %}
+                  <a class="sd-cert-action-link"
+                     href="{{ url_for('download_certificate', filename=r['certificate_file']) }}">
+                    ⬇ Download PDF
+                  </a>
+                {% elif r['attendance_status'] == 'absent' %}
+                  <span class="sd-cert-na">Not available</span>
+                {% else %}
+                  <span class="sd-cert-na">Not generated</span>
+                {% endif %}
+              </td>
+              <td>
+                <a class="sd-row-link"
+                   href="{{ url_for('event_detail', event_id=r['event_id']) }}"
+                   title="View event">›</a>
+              </td>
+            </tr>
+            {% else %}
+            <tr class="sd-empty-row">
+              <td colspan="6">
+                <span class="sd-empty-icon">📋</span>
+                You have not registered for any events yet.<br>
+                <a href="{{ url_for('events') }}" style="color:var(--hive-teal-600);font-weight:600">
+                  Explore Events →
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Latest Updates -->
+      <div class="sd-section">
+        <div class="sd-section-header">
+          <div class="sd-section-title-row">
+            <div class="sd-section-icon" style="background:rgba(251,176,59,.12)">🔔</div>
+            <div>
+              <div class="sd-section-title">Latest Updates</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sd-updates-body">
+          {% for u in updates %}
+          <div class="sd-update-item">
+            <div class="sd-update-title">{{ u['title'] }}</div>
+            <div class="sd-update-msg">{{ u['message'] }}</div>
+            <div class="sd-update-meta">
+              {{ u.get('event_title') or 'HIVE' }} &bull; {{ u.get('created_at') or '' }}
+            </div>
+          </div>
+          {% else %}
+          <div class="sd-updates-empty">
+            <div class="sd-updates-empty-icon">💬</div>
+            <div class="sd-updates-empty-title">No new updates</div>
+            <div class="sd-updates-empty-sub">You're all caught up.</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div><!-- /.sd-bottom-grid -->
+
+  </div><!-- /.sd-content -->
+</div><!-- /.sd-page -->
+{% endblock %}

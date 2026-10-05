@@ -1,0 +1,11 @@
+﻿{% extends "base.html" %}
+{% block title %}{{ title }} | SRIT HIVE{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 560px; margin: 60px auto; text-align: center; padding: 48px 36px;">
+  <div style="font-size: 3rem; margin-bottom: 16px;">✨</div>
+  <h2 style="font-size: 1.6rem; font-weight: 800; color: var(--hive-text-title); margin-bottom: 8px;">{{ title }}</h2>
+  <p style="color: var(--hive-text-body); font-size: 0.95rem; margin-bottom: 28px; line-height: 1.6;">{{ message }}</p>
+  <a class="btn btn-dark" href="{{ url_for('index') }}" style="padding: 10px 24px;">&larr; Return to Home</a>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+﻿{% extends "base.html" %}
+{% block title %}Edit Transcript | SRIT HIVE{% endblock %}
+
+{% block content %}
+<div class="form-card" style="max-width: 760px; margin: 24px auto 60px;">
+  <div style="margin-bottom: 24px;">
+    <span class="badge teal" style="margin-bottom: 8px;">🎙️ Audio Transcript</span>
+    <h1 style="font-size: 1.65rem; font-weight: 800; color: var(--hive-text-title); margin-bottom: 4px;">Edit Event Transcript</h1>
+    <p class="small">Update the title, AI summary, or transcribed speech text for this session.</p>
+  </div>
+
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="field full" style="margin-bottom: 18px;">
+      <label for="title">Transcript Title <span style="color:var(--hive-red)">*</span></label>
+      <input name="title" id="title" value="{{ transcript.get('title') or 'Event Transcript' }}" required>
+    </div>
+
+    <div class="field full" style="margin-bottom: 18px;">
+      <label for="summary">AI Summary / Key Takeaways</label>
+      <textarea name="summary" id="summary" placeholder="Executive summary or key highlights..." style="min-height: 100px;">{{ transcript.get('summary_text') or transcript.get('summary') or '' }}</textarea>
+    </div>
+
+    <div class="field full" style="margin-bottom: 24px;">
+      <label for="raw_text">Full Transcript Text</label>
+      <textarea name="raw_text" id="raw_text" placeholder="Complete speech-to-text transcript..." style="min-height: 200px;">{{ transcript.get('raw_text') or '' }}</textarea>
+    </div>
+
+    <div style="display:flex; gap: 12px; align-items:center; padding-top: 16px; border-top: 1px solid var(--hive-border);">
+      <button type="submit" class="btn btn-primary" style="padding: 10px 22px;">Save Changes &rarr;</button>
+      <a class="btn btn-secondary" href="{{ url_for('event_detail', event_id=transcript.get('event_id')) }}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

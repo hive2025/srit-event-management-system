@@ -1,0 +1,855 @@
+{% extends "base.html" %}
+{% block title %}Faculty Dashboard | SRIT HIVE{% endblock %}
+
+{% block content %}
+<style>
+  /* =========================================================
+     SRIT HIVE - Faculty Dashboard Design System
+     Matching the Reference UI (media_1789725665357.png)
+     ========================================================= */
+  :root {
+    --hive-dark-navy: #051d2d;
+    --hive-navy-950: #031420;
+    --hive-navy-900: #07253b;
+    --hive-navy-800: #0a3350;
+    --hive-navy-700: #0d466c;
+    --hive-blue-600: #1d72b8;
+    --hive-teal-600: #0d8b8b;
+    --hive-teal-500: #14b8a6;
+    --hive-green-600: #0e8a5b;
+    --hive-green-500: #10b981;
+    --hive-gold-500: #f59e0b;
+    --hive-gold-400: #fbb03b;
+    --hive-gold-100: #fef3c7;
+    --hive-surface: #ffffff;
+    --hive-bg: #f4f7f9;
+    --hive-border: #e2e8f0;
+    --hive-border-subtle: #edf2f7;
+    --hive-text-title: #07253b;
+    --hive-text-body: #475569;
+    --hive-text-muted: #64748b;
+  }
+
+  /* Main Container */
+  .container {
+    max-width: 1240px !important;
+    padding: 0 20px 60px !important;
+  }
+
+  /* -------------------------------------------------------------
+     DASHBOARD HERO BANNER (Matching Reference UI)
+     ------------------------------------------------------------- */
+  .hive-dash-hero {
+    margin-top: 14px;
+    margin-bottom: 24px;
+    border-radius: 20px;
+    background: linear-gradient(115deg, #031a2b 0%, #06314c 35%, #0a4f73 70%, #0d6385 100%);
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 16px 36px -10px rgba(5, 29, 45, 0.35);
+    min-height: 240px;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Dot Grid Pattern on top-left */
+  .hive-dash-hero-dots {
+    position: absolute;
+    top: 20px;
+    left: 28px;
+    width: 80px;
+    height: 50px;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.22) 1.5px, transparent 1.5px);
+    background-size: 12px 12px;
+    pointer-events: none;
+  }
+
+  /* Diagonal Gold Accent Streak */
+  .hive-dash-accent-streak {
+    position: absolute;
+    bottom: 25px;
+    left: 280px;
+    width: 140px;
+    height: 2px;
+    background: linear-gradient(90deg, #fbb03b, rgba(251, 176, 59, 0.1));
+    transform: rotate(-25deg);
+    pointer-events: none;
+  }
+
+  /* Campus Photo on the Right */
+  .hive-dash-hero-building-bg {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 52%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.15) 15%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,1) 85%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.15) 15%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,1) 85%);
+  }
+  .hive-dash-hero-campus-img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: center 30%;
+    filter: contrast(1.06) brightness(0.92);
+  }
+  .hive-dash-hero-img-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, #031a2b 0%, rgba(3, 26, 43, 0.45) 30%, transparent 75%),
+                linear-gradient(to top, rgba(3, 26, 43, 0.45) 0%, transparent 40%);
+    pointer-events: none;
+  }
+
+  .hive-dash-hero-inner {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    padding: 36px 40px;
+  }
+
+  .hive-dash-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    color: #94a3b8;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .hive-dash-eyebrow::after {
+    content: "";
+    display: inline-block;
+    width: 24px;
+    height: 2px;
+    background: var(--hive-gold-400);
+    border-radius: 1px;
+  }
+
+  .hive-dash-headline {
+    font-size: 34px;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0 0 8px;
+    color: #ffffff;
+  }
+  .hive-dash-headline .highlight-gold {
+    color: var(--hive-gold-400);
+  }
+
+  .hive-dash-subtext {
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: #e2e8f0;
+    margin: 0 0 22px;
+    font-weight: 400;
+  }
+
+  /* Gold + New Event Button */
+  .hive-btn-new-event {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--hive-gold-400);
+    color: #081d2c;
+    font-weight: 700;
+    font-size: 13.5px;
+    padding: 10px 22px;
+    border-radius: 8px;
+    text-decoration: none;
+    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.35);
+    transition: all 0.2s ease;
+  }
+  .hive-btn-new-event:hover {
+    background: #f59e0b;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.5);
+    color: #081d2c;
+  }
+
+  /* -------------------------------------------------------------
+     KPI METRICS ROW (Matching Reference UI)
+     ------------------------------------------------------------- */
+  .hive-dash-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 26px;
+  }
+
+  .hive-kpi-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px 22px;
+    box-shadow: 0 4px 20px rgba(7, 37, 59, 0.04);
+    border: 1px solid #eef2f6;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .hive-kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(7, 37, 59, 0.07);
+  }
+
+  /* Subtle Corner Glow/Accent */
+  .hive-kpi-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, transparent 50%, rgba(20, 184, 166, 0.08) 100%);
+    pointer-events: none;
+  }
+
+  .hive-kpi-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .hive-kpi-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .hive-kpi-icon.blue { background: #eff6ff; color: #2563eb; }
+  .hive-kpi-icon.sky { background: #f0f9ff; color: #0284c7; }
+  .hive-kpi-icon.green { background: #ecfdf5; color: #10b981; }
+  .hive-kpi-icon.purple { background: #f5f3ff; color: #7c3aed; }
+
+  .hive-kpi-info {
+    display: flex;
+    flex-direction: column;
+  }
+  .hive-kpi-num {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--hive-text-title);
+    line-height: 1.1;
+  }
+  .hive-kpi-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--hive-text-muted);
+    margin-top: 2px;
+  }
+
+  .hive-kpi-arrow {
+    color: #cbd5e1;
+    font-size: 15px;
+    font-weight: 700;
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+  .hive-kpi-card:hover .hive-kpi-arrow {
+    color: var(--hive-teal-600);
+    transform: translateX(3px);
+  }
+
+  /* -------------------------------------------------------------
+     MY EVENTS WORKSPACE TABLE (Matching Reference UI)
+     ------------------------------------------------------------- */
+  .hive-workspace-card {
+    background: #ffffff;
+    border-radius: 18px;
+    border: 1px solid #eef2f6;
+    box-shadow: 0 8px 24px rgba(7, 37, 59, 0.04);
+    padding: 24px 28px 28px;
+    margin-bottom: 30px;
+  }
+
+  .hive-workspace-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .hive-workspace-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .hive-workspace-icon {
+    font-size: 20px;
+  }
+  .hive-workspace-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--hive-text-title);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .hive-workspace-gold-line {
+    width: 32px;
+    height: 3px;
+    background: var(--hive-gold-400);
+    border-radius: 2px;
+  }
+
+  /* Table Layout */
+  .hive-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+  }
+  .hive-mgmt-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    text-align: left;
+  }
+  .hive-mgmt-table th {
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 12px 16px;
+    border: none;
+  }
+  .hive-mgmt-table th:first-child {
+    border-radius: 8px 0 0 8px;
+    padding-left: 20px;
+  }
+  .hive-mgmt-table th:last-child {
+    border-radius: 0 8px 8px 0;
+    text-align: right;
+    padding-right: 20px;
+  }
+
+  .hive-mgmt-table td {
+    padding: 18px 16px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 13.5px;
+    color: var(--hive-text-body);
+  }
+  .hive-mgmt-table tr:last-child td {
+    border-bottom: none;
+  }
+  .hive-mgmt-table tbody tr {
+    transition: background-color 0.15s ease;
+  }
+  .hive-mgmt-table tbody tr:hover {
+    background-color: #f8fafc;
+  }
+  .hive-mgmt-table td:first-child {
+    padding-left: 20px;
+  }
+  .hive-mgmt-table td:last-child {
+    text-align: right;
+    padding-right: 20px;
+  }
+
+  /* Event Info Column */
+  .hive-event-cell {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    max-width: 440px;
+  }
+  .hive-event-thumb {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #07253b 0%, #0d466c 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(7, 37, 59, 0.15);
+  }
+  .hive-event-cell-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .hive-event-name {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--hive-text-title);
+    text-decoration: none;
+    line-height: 1.25;
+    transition: color 0.15s ease;
+  }
+  .hive-event-name:hover {
+    color: var(--hive-teal-600);
+  }
+  .hive-event-venue {
+    font-size: 12px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* Date Text */
+  .hive-date-text {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #475569;
+    white-space: nowrap;
+  }
+
+  /* Status Badges */
+  .hive-status-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .hive-status-tag.completed {
+    background: #ecfdf5;
+    color: #0e8a5b;
+    border: 1px solid #a7f3d0;
+  }
+  .hive-status-tag.upcoming {
+    background: #f0f9ff;
+    color: #0284c7;
+    border: 1px solid #bae6fd;
+  }
+  .hive-status-tag.open {
+    background: #fefce8;
+    color: #ca8a04;
+    border: 1px solid #fef08a;
+  }
+  .hive-status-tag.ongoing {
+    background: #fdf4ff;
+    color: #9333ea;
+    border: 1px solid #f5d0fe;
+  }
+  .hive-status-tag.cancelled {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+  }
+
+  /* Registrations Count */
+  .hive-reg-count {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--hive-text-title);
+  }
+
+  /* Manage Action Button */
+  .hive-btn-manage {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--hive-dark-navy);
+    color: #ffffff !important;
+    font-size: 12.5px;
+    font-weight: 700;
+    padding: 7px 18px;
+    border-radius: 999px;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(7, 37, 59, 0.18);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+  .hive-btn-manage:hover {
+    background: var(--hive-navy-700);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(7, 37, 59, 0.28);
+  }
+
+  /* Empty State Box */
+  .hive-empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    background: #f8fafc;
+    border-radius: 14px;
+    border: 1px dashed #cbd5e1;
+    margin: 10px 0;
+  }
+  .hive-empty-icon {
+    font-size: 38px;
+    margin-bottom: 12px;
+  }
+  .hive-empty-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--hive-text-title);
+    margin: 0 0 6px;
+  }
+  .hive-empty-desc {
+    font-size: 13.5px;
+    color: var(--hive-text-muted);
+    margin: 0 0 18px;
+    max-width: 440px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* -------------------------------------------------------------
+     INSTITUTIONAL FOOTER MATCHING /events
+     ------------------------------------------------------------- */
+  .footer {
+    background: var(--hive-dark-navy) !important;
+    color: #cbd5e1 !important;
+    margin-top: 40px !important;
+    padding: 44px 20px 24px !important;
+    border-top: none !important;
+  }
+  .footer-inner {
+    max-width: 1240px !important;
+    margin: 0 auto !important;
+    display: grid !important;
+    grid-template-columns: 2fr 1.2fr 1.8fr !important;
+    gap: 36px !important;
+    align-items: start !important;
+  }
+  .hive-footer-brand-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .hive-footer-logo {
+    height: 36px;
+    width: auto;
+    object-fit: contain;
+  }
+  .hive-footer-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.2;
+  }
+  .hive-footer-sub {
+    font-size: 12px;
+    color: #94a3b8;
+    line-height: 1.2;
+  }
+  .hive-footer-campus {
+    font-size: 12.5px;
+    color: #94a3b8;
+    margin-top: 6px;
+  }
+  .hive-footer-links-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .hive-footer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 13px;
+  }
+  .hive-footer-links a {
+    color: #cbd5e1;
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+  .hive-footer-links a:hover {
+    color: #ffffff;
+  }
+  .hive-footer-features {
+    font-size: 12px;
+    color: #94a3b8;
+    line-height: 1.6;
+    text-align: right;
+  }
+  .hive-footer-bottom-bar {
+    max-width: 1240px;
+    margin: 28px auto 0;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11.5px;
+    color: #64748b;
+  }
+  .hive-footer-tagline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #94a3b8;
+    font-weight: 600;
+  }
+  .hive-footer-gold-bar {
+    width: 24px;
+    height: 3px;
+    background: var(--hive-gold-400);
+    border-radius: 2px;
+  }
+
+  /* Responsive Media Queries */
+  @media (max-width: 1024px) {
+    .hive-dash-kpis {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .footer-inner {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hive-dash-hero {
+      min-height: auto;
+    }
+    .hive-dash-hero-building-bg {
+      opacity: 0.2;
+      width: 100%;
+    }
+    .hive-dash-hero-inner {
+      padding: 28px 20px;
+    }
+    .hive-dash-headline {
+      font-size: 26px;
+    }
+    .hive-dash-kpis {
+      grid-template-columns: 1fr;
+    }
+    .hive-workspace-card {
+      padding: 18px 16px;
+    }
+    .hive-mgmt-table, .hive-mgmt-table tbody, .hive-mgmt-table tr, .hive-mgmt-table td {
+      display: block;
+      width: 100%;
+    }
+    .hive-mgmt-table thead {
+      display: none;
+    }
+    .hive-mgmt-table tbody tr {
+      background: #ffffff;
+      border: 1px solid #eef2f6;
+      border-radius: 12px;
+      margin-bottom: 14px;
+      padding: 14px;
+    }
+    .hive-mgmt-table td {
+      padding: 8px 0 !important;
+      border-bottom: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .hive-mgmt-table td:first-child {
+      display: block;
+      padding-bottom: 12px !important;
+      border-bottom: 1px solid #f1f5f9;
+      margin-bottom: 8px;
+    }
+    .hive-mgmt-table td::before {
+      content: attr(data-label);
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+    }
+    .hive-mgmt-table td:first-child::before {
+      display: none;
+    }
+    .hive-mgmt-table td:last-child {
+      text-align: left;
+      padding-top: 10px !important;
+      border-top: 1px solid #f1f5f9;
+      margin-top: 8px;
+    }
+    .footer-inner {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    .hive-footer-features {
+      text-align: left;
+    }
+  }
+</style>
+
+{# -------------------------------------------------------------
+   FACULTY DASHBOARD HERO BANNER
+   ------------------------------------------------------------- #}
+<section class="hive-dash-hero">
+  <div class="hive-dash-hero-dots"></div>
+  <div class="hive-dash-accent-streak"></div>
+
+  {# Exact SRIT Campus Image on Right #}
+  <div class="hive-dash-hero-building-bg">
+    <img 
+      class="hive-dash-hero-campus-img" 
+      src="{{ url_for('static', filename='images/srit_campus.jpg') }}" 
+      alt="Sri Ramakrishna Institute of Technology"
+      loading="eager"
+    >
+    <div class="hive-dash-hero-img-overlay"></div>
+  </div>
+
+  <div class="hive-dash-hero-inner">
+    <div class="hive-dash-eyebrow">FACULTY PORTAL</div>
+    <h1 class="hive-dash-headline">
+      Faculty <span class="highlight-gold">Dashboard</span>
+    </h1>
+    <p class="hive-dash-subtext">
+      Plan, manage and certify HIVE events.
+    </p>
+    <a class="hive-btn-new-event" href="{{ url_for('create_event') }}">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      + New Event
+    </a>
+  </div>
+</section>
+
+{# -------------------------------------------------------------
+   KPI METRICS ROW (4 Cards)
+   ------------------------------------------------------------- #}
+<section class="hive-dash-kpis">
+  <div class="hive-kpi-card">
+    <div class="hive-kpi-left">
+      <div class="hive-kpi-icon blue">📅</div>
+      <div class="hive-kpi-info">
+        <span class="hive-kpi-num">{{ stats.events }}</span>
+        <span class="hive-kpi-label">My Events</span>
+      </div>
+    </div>
+    <span class="hive-kpi-arrow">→</span>
+  </div>
+
+  <div class="hive-kpi-card">
+    <div class="hive-kpi-left">
+      <div class="hive-kpi-icon sky">👥</div>
+      <div class="hive-kpi-info">
+        <span class="hive-kpi-num">{{ stats.registrations }}</span>
+        <span class="hive-kpi-label">Registrations</span>
+      </div>
+    </div>
+    <span class="hive-kpi-arrow">→</span>
+  </div>
+
+  <div class="hive-kpi-card">
+    <div class="hive-kpi-left">
+      <div class="hive-kpi-icon green">✓</div>
+      <div class="hive-kpi-info">
+        <span class="hive-kpi-num">{{ stats.attendance }}</span>
+        <span class="hive-kpi-label">Attendance</span>
+      </div>
+    </div>
+    <span class="hive-kpi-arrow">→</span>
+  </div>
+
+  <div class="hive-kpi-card">
+    <div class="hive-kpi-left">
+      <div class="hive-kpi-icon purple">📜</div>
+      <div class="hive-kpi-info">
+        <span class="hive-kpi-num">{{ stats.certificates }}</span>
+        <span class="hive-kpi-label">Certificates</span>
+      </div>
+    </div>
+    <span class="hive-kpi-arrow">→</span>
+  </div>
+</section>
+
+{# -------------------------------------------------------------
+   MY EVENTS MANAGEMENT WORKSPACE TABLE
+   ------------------------------------------------------------- #}
+<section class="hive-workspace-card">
+  <div class="hive-workspace-header">
+    <div class="hive-workspace-title-group">
+      <span class="hive-workspace-icon">📅</span>
+      <h2 class="hive-workspace-title">My Events</h2>
+    </div>
+    <div class="hive-workspace-gold-line"></div>
+  </div>
+
+  <div class="hive-table-wrap">
+    <table class="hive-mgmt-table">
+      <thead>
+        <tr>
+          <th>EVENT</th>
+          <th>DATE</th>
+          <th>STATUS</th>
+          <th>REGISTRATIONS</th>
+          <th>ACTION</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in events %}
+          {% set status_slug = (e['status'] or 'upcoming')|lower %}
+          <tr>
+            <td data-label="Event">
+              <div class="hive-event-cell">
+                <div class="hive-event-thumb">
+                  {% if 'hackathon' in (e['title'] or '')|lower or 'idea' in (e['title'] or '')|lower %}
+                    💡
+                  {% elif 'python' in (e['title'] or '')|lower or 'workshop' in (e['title'] or '')|lower or 'tech' in (e['title'] or '')|lower %}
+                    💻
+                  {% elif 'entrepreneur' in (e['title'] or '')|lower or 'startup' in (e['title'] or '')|lower %}
+                    📈
+                  {% else %}
+                    🚀
+                  {% endif %}
+                </div>
+                <div class="hive-event-cell-info">
+                  <a class="hive-event-name" href="{{ url_for('event_detail', event_id=e['id']) }}">
+                    {{ e['title'] }}
+                  </a>
+                  <span class="hive-event-venue">
+                    📍 {{ e['venue'] or 'Sri Ramakrishna Institute of Technology, Coimbatore' }}
+                  </span>
+                </div>
+              </div>
+            </td>
+            <td data-label="Date">
+              <span class="hive-date-text">{{ e['event_date'] }}</span>
+            </td>
+            <td data-label="Status">
+              <span class="hive-status-tag {{ status_slug }}">
+                {{ e['status'] or 'Upcoming' }}
+              </span>
+            </td>
+            <td data-label="Registrations">
+              <span class="hive-reg-count">{{ e['registrations_count'] }}</span>
+            </td>
+            <td data-label="Action">
+              <a class="hive-btn-manage" href="{{ url_for('manage_event', event_id=e['id']) }}">
+                Manage →
+              </a>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="5" style="padding: 0; border: none;">
+              <div class="hive-empty-state">
+                <div class="hive-empty-icon">📋</div>
+                <h3 class="hive-empty-title">No events created yet</h3>
+                <p class="hive-empty-desc">You haven't scheduled or created any events yet. Start by creating your first HIVE event.</p>
+                <a class="hive-btn-new-event" href="{{ url_for('create_event') }}">+ New Event</a>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

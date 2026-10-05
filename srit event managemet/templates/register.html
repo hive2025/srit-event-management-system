@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+{% block title %}Register | SRIT HIVE - Create Account{% endblock %}
+
+{% block content %}
+<style>
+.auth-wrapper {
+  max-width: 680px;
+  margin: 30px auto 50px;
+}
+
+.auth-card {
+  background: var(--hive-surface);
+  border: 1px solid var(--hive-border);
+  border-radius: var(--radius-xl);
+  padding: 38px 36px;
+  box-shadow: var(--shadow-lg);
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.auth-logo {
+  height: 48px;
+  width: auto;
+  margin: 0 auto 12px;
+}
+
+.auth-title {
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: var(--hive-text-title);
+  margin-bottom: 4px;
+}
+
+.auth-sub {
+  font-size: 0.85rem;
+  color: var(--hive-text-muted);
+}
+
+.auth-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.auth-btn-submit {
+  width: 100%;
+  padding: 12px 20px;
+  background: var(--hive-dark-navy);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: all .2s;
+  box-shadow: 0 4px 12px rgba(5,29,45,.2);
+}
+
+.auth-btn-submit:hover {
+  background: var(--hive-navy-700);
+  transform: translateY(-1px);
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--hive-border-subtle);
+  font-size: 0.82rem;
+  color: var(--hive-text-muted);
+}
+
+.auth-footer a {
+  color: var(--hive-teal);
+  font-weight: 700;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .auth-form-grid { grid-template-columns: 1fr; }
+  .auth-card { padding: 24px 20px; }
+}
+</style>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-header">
+      <img src="{{ url_for('static', filename='images/hive_logo.png') }}" alt="SRIT HIVE" class="auth-logo">
+      <h1 class="auth-title">Create HIVE Account</h1>
+      <p class="auth-sub">Register as a student or faculty member to access events &amp; certificates.</p>
+    </div>
+
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      
+      <div class="auth-form-grid">
+        <div class="field full">
+          <label>Account Type <span style="color:var(--hive-red)">*</span></label>
+          <select name="role" required>
+            <option value="student">Student</option>
+            <option value="faculty">Faculty</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Full Name <span style="color:var(--hive-red)">*</span></label>
+          <input name="name" placeholder="e.g. John Doe" required>
+        </div>
+
+        <div class="field">
+          <label>Register / Employee No.</label>
+          <input name="reg_no" placeholder="e.g. 717821E123 / EMP456">
+        </div>
+
+        <div class="field">
+          <label>Department <span style="color:var(--hive-red)">*</span></label>
+          <select name="department" required>
+            <option value="CSE">CSE (Computer Science &amp; Engg)</option>
+            <option value="IT">IT (Information Technology)</option>
+            <option value="ECE">ECE (Electronics &amp; Comm)</option>
+            <option value="EEE">EEE (Electrical &amp; Electronics)</option>
+            <option value="MECH">MECH (Mechanical Engg)</option>
+            <option value="CIVIL">CIVIL (Civil Engg)</option>
+            <option value="S&H">S&amp;H (Science &amp; Humanities)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Year / Designation</label>
+          <input name="year" placeholder="e.g. 3rd Year / Asst. Professor">
+        </div>
+
+        <div class="field">
+          <label>Email ID <span style="color:var(--hive-red)">*</span></label>
+          <input type="email" name="email" placeholder="name@srit.ac.in" required>
+        </div>
+
+        <div class="field">
+          <label>Phone Number</label>
+          <input name="phone" placeholder="+91 98765 43210">
+        </div>
+
+        <div class="field">
+          <label>Password <span style="color:var(--hive-red)">*</span></label>
+          <input type="password" name="password" id="password" placeholder="Minimum 6 characters" required minlength="6" autocomplete="new-password">
+        </div>
+
+        <div class="field">
+          <label>Confirm Password <span style="color:var(--hive-red)">*</span></label>
+          <input type="password" name="confirm_password" id="confirm_password" placeholder="Re-enter password" required minlength="6" autocomplete="new-password">
+        </div>
+      </div>
+
+      <button class="auth-btn-submit" type="submit">Create Account &rarr;</button>
+
+      <div class="auth-footer">
+        Already have an account? <a href="{{ url_for('login') }}">Sign In to HIVE</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form');
+  const password = document.getElementById('password');
+  const confirmPassword = document.getElementById('confirm_password');
+
+  if (form && password && confirmPassword) {
+    form.addEventListener('submit', function(e) {
+      if (password.value !== confirmPassword.value) {
+        e.preventDefault();
+        alert('Passwords do not match. Please verify your password and confirm password.');
+        confirmPassword.focus();
+        return false;
+      }
+      if (password.value.length < 6) {
+        e.preventDefault();
+        alert('Password must be at least 6 characters long.');
+        password.focus();
+        return false;
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

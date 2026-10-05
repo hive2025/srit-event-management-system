@@ -1,0 +1,127 @@
+﻿{% extends "base.html" %}
+{% block title %}My Profile | SRIT HIVE{% endblock %}
+
+{% block content %}
+<style>
+.profile-wrapper {
+  max-width: 720px;
+  margin: 30px auto 50px;
+}
+
+.profile-card {
+  background: var(--hive-surface);
+  border: 1px solid var(--hive-border);
+  border-radius: var(--radius-xl);
+  padding: 38px 36px;
+  box-shadow: var(--shadow-md);
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 24px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--hive-border);
+}
+
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--hive-dark-navy), var(--hive-teal));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 1.8rem;
+  font-weight: 800;
+  box-shadow: 0 4px 14px rgba(5,29,45,.15);
+  flex-shrink: 0;
+}
+
+.profile-name-block h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--hive-text-title);
+  margin-bottom: 4px;
+}
+
+.profile-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.profile-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--hive-border-subtle);
+}
+
+@media (max-width: 640px) {
+  .profile-card { padding: 24px 20px; }
+  .profile-header { flex-direction: column; text-align: center; }
+  .profile-badges { justify-content: center; }
+  .profile-actions { flex-direction: column; align-items: stretch; }
+  .profile-actions .btn { width: 100%; margin: 0; }
+}
+</style>
+
+<div class="profile-wrapper">
+  <div class="profile-card">
+    <div class="profile-header">
+      <div class="profile-avatar">
+        {{ (user.get('name', 'U')[:1] if user else 'U') | upper }}
+      </div>
+      <div class="profile-name-block">
+        <h1>{{ user.get('name', 'User Profile') if user else 'User Profile' }}</h1>
+        <div class="profile-badges">
+          <span class="badge teal">{{ (user.get('role', 'Member') if user else 'Member') | upper }}</span>
+          <span class="badge gold">{{ user.get('department', 'SRIT') if user else 'SRIT' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      
+      <div class="form-grid">
+        <div class="field full">
+          <label>Full Name <span style="color:var(--hive-red)">*</span></label>
+          <input name="name" value="{{ user.get('name', '') if user else '' }}" required>
+        </div>
+
+        <div class="field">
+          <label>Department <span style="color:var(--hive-red)">*</span></label>
+          <input name="department" value="{{ user.get('department', '') if user else '' }}" required>
+        </div>
+
+        <div class="field">
+          <label>Year / Designation</label>
+          <input name="year" value="{{ user.get('year', '') if user else '' }}">
+        </div>
+
+        <div class="field">
+          <label>Phone Number</label>
+          <input name="phone" value="{{ user.get('phone', '') if user else '' }}">
+        </div>
+
+        <div class="field">
+          <label>Email Address</label>
+          <input value="{{ user.get('email', '') if user else '' }}" disabled style="background:#edf2f7;color:var(--hive-text-muted);cursor:not-allowed;">
+        </div>
+      </div>
+
+      <div class="profile-actions">
+        <button class="btn btn-dark" type="submit">Save Changes</button>
+        <a class="btn btn-secondary" href="{{ url_for('change_password') }}">Change Password &rarr;</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

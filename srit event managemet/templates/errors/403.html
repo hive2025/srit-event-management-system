@@ -1,0 +1,15 @@
+﻿{% extends "base.html" %}
+{% block title %}403 Forbidden | SRIT HIVE{% endblock %}
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 60px auto; text-align: center; padding: 48px 32px;">
+  <span class="badge red" style="font-size: 0.85rem; padding: 6px 16px;">Error 403</span>
+  <h1 style="color: var(--hive-text-title); margin: 18px 0 10px; font-size: 2rem;">Access Denied</h1>
+  <p style="color: var(--hive-text-muted); line-height: 1.6; margin-bottom: 28px;">
+    You do not have the required permissions to access this page or resource.
+  </p>
+  <div style="display:flex; justify-content:center; gap: 12px; flex-wrap:wrap;">
+    <a class="btn btn-dark" href="{{ url_for('index') }}">Go to Homepage</a>
+    <a class="btn btn-secondary" href="{{ url_for('dashboard') }}">My Dashboard</a>
+  </div>
+</div>
+{% endblock %}

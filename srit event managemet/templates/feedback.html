@@ -1,0 +1,97 @@
+﻿{% extends "base.html" %}
+{% block title %}Feedback: {{ event['title'] }} | SRIT HIVE{% endblock %}
+
+{% block content %}
+<div class="form-card" style="max-width: 740px; margin: 24px auto 60px;">
+  <div style="margin-bottom: 24px;">
+    <span class="badge gold" style="margin-bottom: 8px;">⭐ Event Evaluation</span>
+    <h1 style="font-size: 1.65rem; font-weight: 800; color: var(--hive-text-title); margin-bottom: 4px;">
+      Event Feedback: {{ event['title'] }}
+    </h1>
+    <p class="small">Share your experience to help SRIT HIVE improve future workshops and initiatives.</p>
+  </div>
+
+  {% if user_feedback %}
+  <div class="alert success" style="margin-bottom: 24px;">
+    <span>✓</span>
+    <div>
+      <strong>Feedback recorded!</strong> You previously submitted feedback on {{ user_feedback.get('submitted_at') or user_feedback.get('created_at') or 'record' }}. You may update your responses below.
+    </div>
+  </div>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('feedback', event_id=event['id']) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    
+    <!-- Question 1 -->
+    <div class="field" style="margin-bottom: 20px;">
+      <label for="q1_rating">
+        1. How would you rate the overall event? <span style="color: var(--hive-red);">*</span>
+      </label>
+      <select name="q1_rating" id="q1_rating" required>
+        <option value="" disabled {% if not user_feedback %}selected{% endif %}>-- Select rating (1 to 5) --</option>
+        <option value="5" {% if user_feedback and (user_feedback.get('q1_rating') == 5 or user_feedback.get('rating') == 5) %}selected{% endif %}>⭐⭐⭐⭐⭐ (5 - Excellent)</option>
+        <option value="4" {% if user_feedback and (user_feedback.get('q1_rating') == 4 or user_feedback.get('rating') == 4) %}selected{% endif %}>⭐⭐⭐⭐ (4 - Very Good)</option>
+        <option value="3" {% if user_feedback and (user_feedback.get('q1_rating') == 3 or user_feedback.get('rating') == 3) %}selected{% endif %}>⭐⭐⭐ (3 - Good)</option>
+        <option value="2" {% if user_feedback and (user_feedback.get('q1_rating') == 2 or user_feedback.get('rating') == 2) %}selected{% endif %}>⭐⭐ (2 - Fair)</option>
+        <option value="1" {% if user_feedback and (user_feedback.get('q1_rating') == 1 or user_feedback.get('rating') == 1) %}selected{% endif %}>⭐ (1 - Needs Improvement)</option>
+      </select>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="field" style="margin-bottom: 20px;">
+      <label for="q2_rating">
+        2. How satisfied were you with the event arrangements and organization? <span style="color: var(--hive-red);">*</span>
+      </label>
+      <select name="q2_rating" id="q2_rating" required>
+        <option value="" disabled {% if not user_feedback %}selected{% endif %}>-- Select satisfaction (1 to 5) --</option>
+        <option value="5" {% if user_feedback and (user_feedback.get('q2_rating') == 5 or (not user_feedback.get('q2_rating') and user_feedback.get('rating') == 5)) %}selected{% endif %}>⭐⭐⭐⭐⭐ (5 - Highly Satisfied)</option>
+        <option value="4" {% if user_feedback and (user_feedback.get('q2_rating') == 4 or (not user_feedback.get('q2_rating') and user_feedback.get('rating') == 4)) %}selected{% endif %}>⭐⭐⭐⭐ (4 - Satisfied)</option>
+        <option value="3" {% if user_feedback and (user_feedback.get('q2_rating') == 3 or (not user_feedback.get('q2_rating') and user_feedback.get('rating') == 3)) %}selected{% endif %}>⭐⭐⭐ (3 - Neutral)</option>
+        <option value="2" {% if user_feedback and (user_feedback.get('q2_rating') == 2 or (not user_feedback.get('q2_rating') and user_feedback.get('rating') == 2)) %}selected{% endif %}>⭐⭐ (2 - Dissatisfied)</option>
+        <option value="1" {% if user_feedback and (user_feedback.get('q2_rating') == 1 or (not user_feedback.get('q2_rating') and user_feedback.get('rating') == 1)) %}selected{% endif %}>⭐ (1 - Highly Dissatisfied)</option>
+      </select>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="field" style="margin-bottom: 20px;">
+      <label for="q3_rating">
+        3. How informative, practical and useful was the session content? <span style="color: var(--hive-red);">*</span>
+      </label>
+      <select name="q3_rating" id="q3_rating" required>
+        <option value="" disabled {% if not user_feedback %}selected{% endif %}>-- Select usefulness (1 to 5) --</option>
+        <option value="5" {% if user_feedback and (user_feedback.get('q3_rating') == 5 or (not user_feedback.get('q3_rating') and user_feedback.get('rating') == 5)) %}selected{% endif %}>⭐⭐⭐⭐⭐ (5 - Extremely Useful)</option>
+        <option value="4" {% if user_feedback and (user_feedback.get('q3_rating') == 4 or (not user_feedback.get('q3_rating') and user_feedback.get('rating') == 4)) %}selected{% endif %}>⭐⭐⭐⭐ (4 - Very Useful)</option>
+        <option value="3" {% if user_feedback and (user_feedback.get('q3_rating') == 3 or (not user_feedback.get('q3_rating') and user_feedback.get('rating') == 3)) %}selected{% endif %}>⭐⭐⭐ (3 - Moderately Useful)</option>
+        <option value="2" {% if user_feedback and (user_feedback.get('q3_rating') == 2 or (not user_feedback.get('q3_rating') and user_feedback.get('rating') == 2)) %}selected{% endif %}>⭐⭐ (2 - Slightly Useful)</option>
+        <option value="1" {% if user_feedback and (user_feedback.get('q3_rating') == 1 or (not user_feedback.get('q3_rating') and user_feedback.get('rating') == 1)) %}selected{% endif %}>⭐ (1 - Not Useful)</option>
+      </select>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="field full" style="margin-bottom: 20px;">
+      <label for="q4_response">
+        4. What did you like most about the event? <span style="color: var(--hive-red);">*</span>
+      </label>
+      <textarea name="q4_response" id="q4_response" required placeholder="Describe what you enjoyed or found most valuable..." style="min-height: 95px;">{{ user_feedback.get('q4_response') or user_feedback.get('comments') or '' if user_feedback else '' }}</textarea>
+    </div>
+
+    <!-- Question 5 -->
+    <div class="field full" style="margin-bottom: 28px;">
+      <label for="q5_response">
+        5. What suggestions or improvements would you offer for future events? <span style="color: var(--hive-red);">*</span>
+      </label>
+      <textarea name="q5_response" id="q5_response" required placeholder="Share any suggestions, topics you'd like to see, or feedback for the organizers..." style="min-height: 95px;">{{ user_feedback.get('q5_response') or '' if user_feedback else '' }}</textarea>
+    </div>
+
+    <div style="display:flex; gap: 12px; align-items:center; padding-top: 18px; border-top: 1px solid var(--hive-border);">
+      <button type="submit" class="btn btn-primary" style="padding: 10px 22px;">
+        Submit Feedback &rarr;
+      </button>
+      <a class="btn btn-secondary" href="{{ url_for('event_detail', event_id=event['id']) }}">
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}

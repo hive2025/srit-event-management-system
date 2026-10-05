@@ -1,0 +1,812 @@
+{% extends "base.html" %}
+{% block title %}{{ event['title'] }} | SRIT HIVE{% endblock %}
+
+{% block content %}
+<style>
+/* ── SRIT HIVE Design Tokens ────────────────────────────────────────── */
+:root {
+  --hive-dark-navy:  #051d2d;
+  --hive-navy-900:   #07253b;
+  --hive-navy-700:   #0d466c;
+  --hive-navy-500:   #1a6a9a;
+  --hive-teal-600:   #0d8b8b;
+  --hive-teal-500:   #14b8a6;
+  --hive-green-500:  #10b981;
+  --hive-gold-400:   #fbb03b;
+  --hive-gold-500:   #f59e0b;
+  --hive-bg:         #f4f7f9;
+  --hive-surface:    #ffffff;
+  --hive-border:     #e2e8f0;
+  --hive-text-title: #07253b;
+  --hive-text-body:  #475569;
+  --hive-text-muted: #64748b;
+}
+
+/* ── Base resets ─────────────────────────────────────────────────────── */
+.container { padding: 0 !important; max-width: 100% !important; }
+body { background: var(--hive-bg) !important; }
+
+/* ── Page Layout ─────────────────────────────────────────────────────── */
+.ed-page {
+  background: var(--hive-bg);
+  min-height: calc(100vh - 64px);
+}
+
+/* ── Hero Section ────────────────────────────────────────────────────── */
+.ed-hero {
+  position: relative;
+  background: linear-gradient(135deg, var(--hive-dark-navy) 0%, var(--hive-navy-900) 50%, var(--hive-navy-700) 100%);
+  padding: 2.5rem 2rem 3rem;
+  color: #fff;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  overflow: hidden;
+}
+.ed-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 85% 20%, rgba(20,184,166,.18) 0%, transparent 50%),
+    radial-gradient(circle at 15% 80%, rgba(251,176,59,.12) 0%, transparent 45%);
+  pointer-events: none;
+}
+.ed-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+.ed-hero-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+/* Back Link */
+.ed-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .8rem;
+  font-weight: 600;
+  color: #94b8cc;
+  text-decoration: none;
+  margin-bottom: 1.25rem;
+  padding: .35rem .75rem;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 8px;
+  transition: all .2s;
+}
+.ed-back-link:hover {
+  color: #fff;
+  background: rgba(255,255,255,.12);
+  transform: translateX(-2px);
+}
+
+.ed-hero-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+.ed-hero-main {
+  flex: 1;
+  min-width: 320px;
+}
+
+.ed-category-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  background: rgba(20,184,166,.18);
+  border: 1px solid rgba(20,184,166,.35);
+  color: var(--hive-teal-500);
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: .3rem .75rem;
+  border-radius: 20px;
+  margin-bottom: .85rem;
+}
+
+.ed-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.2;
+  margin: 0 0 .85rem;
+  letter-spacing: -.02em;
+}
+
+.ed-description {
+  font-size: .95rem;
+  color: #b0c8da;
+  line-height: 1.6;
+  max-width: 780px;
+  margin-bottom: 1.5rem;
+}
+
+/* Metadata chips */
+.ed-meta-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  margin-bottom: 1.5rem;
+}
+.ed-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 10px;
+  padding: .5rem .85rem;
+  font-size: .82rem;
+  color: #e2e8f0;
+  backdrop-filter: blur(4px);
+}
+.ed-chip-icon {
+  font-size: .95rem;
+}
+.ed-chip strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Hero Action Box */
+.ed-hero-action {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.ed-registered-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  background: rgba(16,185,129,.2);
+  border: 1px solid rgba(16,185,129,.4);
+  color: #34d399;
+  font-size: .85rem;
+  font-weight: 700;
+  padding: .6rem 1.1rem;
+  border-radius: 10px;
+}
+.ed-btn-cancel {
+  background: rgba(239,68,68,.12);
+  border: 1px solid rgba(239,68,68,.3);
+  color: #f87171;
+  font-size: .82rem;
+  font-weight: 600;
+  padding: .6rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.ed-btn-cancel:hover {
+  background: rgba(239,68,68,.22);
+  color: #fca5a5;
+}
+.ed-btn-register {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  background: var(--hive-gold-400);
+  color: var(--hive-dark-navy);
+  font-size: .92rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+  padding: .75rem 1.75rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(251,176,59,.3);
+  transition: all .2s;
+}
+.ed-btn-register:hover {
+  background: var(--hive-gold-500);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(251,176,59,.4);
+}
+
+/* ── Content Grid ────────────────────────────────────────────────────── */
+.ed-content {
+  max-width: 1200px;
+  margin: -1.5rem auto 3rem;
+  padding: 0 2rem;
+  position: relative;
+  z-index: 3;
+}
+.ed-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* ── Card Styles ─────────────────────────────────────────────────────── */
+.ed-card {
+  background: var(--hive-surface);
+  border: 1px solid var(--hive-border);
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(5,29,45,.06);
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+}
+.ed-card-header {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--hive-border);
+}
+.ed-card-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.ed-card-icon.navy { background: rgba(7,37,59,.08); color: var(--hive-navy-900); }
+.ed-card-icon.teal { background: rgba(13,139,139,.12); color: var(--hive-teal-600); }
+.ed-card-icon.gold { background: rgba(251,176,59,.15); color: var(--hive-gold-500); }
+.ed-card-icon.green{ background: rgba(16,185,129,.12); color: var(--hive-green-500); }
+
+.ed-card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--hive-text-title);
+  margin: 0;
+}
+.ed-card-subtitle {
+  font-size: .75rem;
+  color: var(--hive-text-muted);
+  margin: .15rem 0 0;
+}
+
+/* Info Grid Layout for Details */
+.ed-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+.ed-info-item {
+  background: #f8fafc;
+  border: 1px solid var(--hive-border);
+  border-radius: 12px;
+  padding: 1rem 1.15rem;
+}
+.ed-info-item.full-width {
+  grid-column: 1 / -1;
+}
+.ed-info-label {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--hive-teal-600);
+  margin-bottom: .4rem;
+}
+.ed-info-val {
+  font-size: .88rem;
+  color: var(--hive-text-body);
+  line-height: 1.55;
+}
+.ed-info-val strong {
+  color: var(--hive-text-title);
+}
+
+/* Speaker Profile */
+.ed-speaker-card {
+  background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid var(--hive-border);
+  border-radius: 14px;
+  padding: 1.35rem;
+  margin-top: 1.25rem;
+}
+.ed-speaker-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.ed-speaker-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--hive-navy-700), var(--hive-teal-600));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(13,70,108,.2);
+}
+.ed-speaker-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--hive-text-title);
+  margin-bottom: .2rem;
+}
+.ed-speaker-title {
+  font-size: .8rem;
+  color: var(--hive-text-muted);
+}
+.ed-speaker-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: .75rem;
+  margin-top: .85rem;
+  padding-top: .85rem;
+  border-top: 1px solid var(--hive-border);
+}
+.ed-speaker-bio {
+  grid-column: 1 / -1;
+  font-size: .82rem;
+  color: var(--hive-text-body);
+  line-height: 1.55;
+  background: #ffffff;
+  padding: .85rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--hive-border);
+}
+
+/* Feedback Card */
+.ed-feedback-box {
+  background: #ffffff;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.ed-feedback-status {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-size: .88rem;
+  font-weight: 600;
+  color: var(--hive-green-500);
+}
+.ed-feedback-desc {
+  font-size: .82rem;
+  color: var(--hive-text-muted);
+  margin-top: .25rem;
+}
+.ed-btn-feedback {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  background: var(--hive-navy-900);
+  color: #fff;
+  font-size: .82rem;
+  font-weight: 600;
+  padding: .65rem 1.25rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.ed-btn-feedback:hover {
+  background: var(--hive-teal-600);
+  transform: translateY(-1px);
+}
+.ed-btn-feedback-sec {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  background: #f1f5f9;
+  color: var(--hive-text-title);
+  border: 1px solid var(--hive-border);
+  font-size: .82rem;
+  font-weight: 600;
+  padding: .65rem 1.25rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.ed-btn-feedback-sec:hover {
+  background: #e2e8f0;
+}
+
+/* Sidebar Updates */
+.ed-update-item {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--hive-border);
+}
+.ed-update-item:first-child { padding-top: 0; }
+.ed-update-item:last-child { border-bottom: none; padding-bottom: 0; }
+.ed-update-head {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .88rem;
+  font-weight: 700;
+  color: var(--hive-text-title);
+  margin-bottom: .3rem;
+}
+.ed-update-msg {
+  font-size: .82rem;
+  color: var(--hive-text-body);
+  line-height: 1.5;
+  margin-bottom: .35rem;
+}
+.ed-update-time {
+  font-size: .72rem;
+  color: var(--hive-text-muted);
+}
+.ed-empty-updates {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+.ed-empty-updates-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin: 0 auto .75rem;
+}
+.ed-empty-updates-title {
+  font-size: .88rem;
+  font-weight: 700;
+  color: var(--hive-text-title);
+  margin-bottom: .2rem;
+}
+.ed-empty-updates-sub {
+  font-size: .78rem;
+  color: var(--hive-text-muted);
+}
+
+/* Quick Facts in Sidebar */
+.ed-fact-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .65rem 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: .82rem;
+}
+.ed-fact-item:last-child { border-bottom: none; }
+.ed-fact-label { color: var(--hive-text-muted); }
+.ed-fact-val { font-weight: 600; color: var(--hive-text-title); }
+
+/* ── Responsive ──────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .ed-grid { grid-template-columns: 1fr; }
+  .ed-title { font-size: 1.75rem; }
+  .ed-info-grid { grid-template-columns: 1fr; }
+  .ed-speaker-details { grid-template-columns: 1fr; }
+  .ed-content { padding: 0 1rem; }
+  .ed-hero { padding: 2rem 1.25rem 2.5rem; }
+}
+</style>
+
+<div class="ed-page">
+
+  <!-- ══ HERO SECTION ════════════════════════════════════════════════════ -->
+  <section class="ed-hero">
+    <div class="ed-hero-inner">
+      <a href="{{ url_for('events') }}" class="ed-back-link">
+        &larr; Back to Events
+      </a>
+
+      <div class="ed-hero-header">
+        <div class="ed-hero-main">
+          {% if event.get('program_name') %}
+          <div class="ed-category-badge">
+            <span>✨</span> {{ event['program_name'] }}
+          </div>
+          {% endif %}
+
+          <h1 class="ed-title">{{ event['title'] }}</h1>
+
+          {% if event.get('description') %}
+          <p class="ed-description">{{ event['description'] }}</p>
+          {% endif %}
+
+          <div class="ed-meta-chips">
+            <div class="ed-chip">
+              <span class="ed-chip-icon">📅</span>
+              <span>{{ event['event_date'] or 'Date TBA' }}</span>
+            </div>
+            {% if event.get('start_time') or event.get('end_time') %}
+            <div class="ed-chip">
+              <span class="ed-chip-icon">⏰</span>
+              <span>{{ event['start_time'] }} &ndash; {{ event['end_time'] }}</span>
+            </div>
+            {% endif %}
+            {% if event.get('venue') %}
+            <div class="ed-chip">
+              <span class="ed-chip-icon">📍</span>
+              <span>{{ event['venue'] }}</span>
+            </div>
+            {% endif %}
+            <div class="ed-chip">
+              <span class="ed-chip-icon">👥</span>
+              <span><strong>{{ count }}</strong> / {{ event['capacity'] or '&infin;' }} Seats</span>
+            </div>
+            <div class="ed-chip">
+              <span class="ed-chip-icon">💳</span>
+              <span>
+                {% if event.get('registration_fee') and event['registration_fee'] > 0 %}
+                  <strong>&#8377;{{ "%.0f"|format(event['registration_fee']) }}</strong>
+                {% else %}
+                  <strong>Free</strong>
+                {% endif %}
+              </span>
+            </div>
+          </div>
+
+          <!-- Student Registration Actions -->
+          {% if current_user and current_user['role'] == 'student' %}
+          <div class="ed-hero-action">
+            {% if registered %}
+              <div class="ed-registered-pill">
+                <span>✓</span> You are registered
+              </div>
+              <form method="post" action="{{ url_for('cancel_registration', event_id=event['id']) }}" onsubmit="return confirm('Are you sure you want to cancel your registration?');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="ed-btn-cancel">Cancel Registration</button>
+              </form>
+            {% else %}
+              <form method="post" action="{{ url_for('register_event', event_id=event['id']) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="ed-btn-register">Register for Event &rarr;</button>
+              </form>
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ MAIN TWO-COLUMN CONTENT ═════════════════════════════════════════ -->
+  <main class="ed-content">
+    <div class="ed-grid">
+
+      <!-- PRIMARY COLUMN -->
+      <div class="ed-main-col">
+
+        <!-- Card: Event Details -->
+        <div class="ed-card">
+          <div class="ed-card-header">
+            <div class="ed-card-icon teal">📋</div>
+            <div>
+              <h2 class="ed-card-title">Event Overview</h2>
+              <div class="ed-card-subtitle">Detailed academic and operational information.</div>
+            </div>
+          </div>
+
+          <div class="ed-info-grid">
+            {% if event.get('academic_year') %}
+            <div class="ed-info-item">
+              <div class="ed-info-label">🎓 Academic Year</div>
+              <div class="ed-info-val"><strong>{{ event['academic_year'] }}</strong></div>
+            </div>
+            {% endif %}
+
+            {% if event.get('spc_mapping') %}
+            <div class="ed-info-item">
+              <div class="ed-info-label">🎯 SPC Mapping</div>
+              <div class="ed-info-val"><strong>{{ event['spc_mapping'] }}</strong></div>
+            </div>
+            {% endif %}
+
+            {% if event.get('objectives') %}
+            <div class="ed-info-item full-width">
+              <div class="ed-info-label">🎯 Objectives</div>
+              <div class="ed-info-val">{{ event['objectives'] }}</div>
+            </div>
+            {% endif %}
+
+            {% if event.get('benefits') %}
+            <div class="ed-info-item full-width">
+              <div class="ed-info-label">💡 Expected Benefits / Outcomes</div>
+              <div class="ed-info-val">{{ event['benefits'] }}</div>
+            </div>
+            {% endif %}
+
+            {% if event.get('organizing_details') %}
+            <div class="ed-info-item full-width">
+              <div class="ed-info-label">🏢 Organizing Department &amp; Details</div>
+              <div class="ed-info-val">{{ event['organizing_details'] }}</div>
+            </div>
+            {% endif %}
+
+            {% if event.get('estimated_expenditure') is not none and event['estimated_expenditure'] > 0 %}
+            <div class="ed-info-item">
+              <div class="ed-info-label">💰 Estimated Expenditure</div>
+              <div class="ed-info-val"><strong>&#8377;{{ "%.2f"|format(event['estimated_expenditure'] or 0) }}</strong></div>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Guest Speaker / Resource Person (if available) -->
+          {% if event.get('speaker_name') %}
+          <div class="ed-speaker-card">
+            <div class="ed-speaker-header">
+              <div class="ed-speaker-avatar">🎤</div>
+              <div>
+                <div style="font-size:.7rem;font-weight:700;color:var(--hive-teal-600);text-transform:uppercase;letter-spacing:.06em">Guest Speaker / Resource Person</div>
+                <div class="ed-speaker-name">{{ event['speaker_name'] }}</div>
+                <div class="ed-speaker-title">
+                  {{ event.get('speaker_designation') or '' }}{% if event.get('speaker_designation') and event.get('speaker_organization') %} &bull; {% endif %}{{ event.get('speaker_organization') or '' }}
+                </div>
+              </div>
+            </div>
+
+            <div class="ed-speaker-details">
+              {% if event.get('speaker_expertise') %}
+              <div class="ed-info-item">
+                <div class="ed-info-label">🌟 Expertise</div>
+                <div class="ed-info-val">{{ event['speaker_expertise'] }}</div>
+              </div>
+              {% endif %}
+
+              {% if event.get('speaker_email') %}
+              <div class="ed-info-item">
+                <div class="ed-info-label">✉️ Email</div>
+                <div class="ed-info-val">{{ event['speaker_email'] }}</div>
+              </div>
+              {% endif %}
+
+              {% if event.get('speaker_contact') %}
+              <div class="ed-info-item">
+                <div class="ed-info-label">📞 Contact</div>
+                <div class="ed-info-val">{{ event['speaker_contact'] }}</div>
+              </div>
+              {% endif %}
+
+              {% if event.get('speaker_bio') %}
+              <div class="ed-speaker-bio">
+                <div class="ed-info-label">📝 Biography</div>
+                <div style="white-space: pre-wrap;">{{ event['speaker_bio'] }}</div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Card: Event Feedback (for Registered Students) -->
+        {% if current_user and current_user['role'] == 'student' and registered %}
+        <div class="ed-card">
+          <div class="ed-card-header">
+            <div class="ed-card-icon gold">⭐</div>
+            <div>
+              <h2 class="ed-card-title">Event Feedback</h2>
+              <div class="ed-card-subtitle">Share your insights to help us enhance future events.</div>
+            </div>
+          </div>
+
+          <div class="ed-feedback-box">
+            <div>
+              {% if user_feedback %}
+                <div class="ed-feedback-status">
+                  <span>✓</span> Feedback Submitted
+                </div>
+                <div class="ed-feedback-desc">
+                  Submitted on: {{ user_feedback.get('submitted_at') or user_feedback.get('created_at') or 'Recorded' }}
+                </div>
+              {% else %}
+                <div style="font-size:.88rem;font-weight:700;color:var(--hive-text-title)">
+                  Your feedback matters!
+                </div>
+                <div class="ed-feedback-desc">
+                  Please take a moment to evaluate the sessions, materials, and overall organization.
+                </div>
+              {% endif %}
+            </div>
+
+            <div>
+              {% if user_feedback %}
+                <a href="{{ url_for('feedback', event_id=event['id']) }}" class="ed-btn-feedback-sec">
+                  ✏️ View / Update Feedback
+                </a>
+              {% else %}
+                <a href="{{ url_for('feedback', event_id=event['id']) }}" class="ed-btn-feedback">
+                  ⭐ Submit Feedback (5 Questions)
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+
+      <!-- SIDEBAR COLUMN -->
+      <div class="ed-side-col">
+
+        <!-- Card: Event Updates -->
+        <div class="ed-card">
+          <div class="ed-card-header">
+            <div class="ed-card-icon navy">🔔</div>
+            <div>
+              <h2 class="ed-card-title">Event Updates</h2>
+              <div class="ed-card-subtitle">Announcements &amp; notifications.</div>
+            </div>
+          </div>
+
+          <div class="ed-updates-body">
+            {% for u in updates %}
+            <div class="ed-update-item">
+              <div class="ed-update-head">
+                <span>📌</span> {{ u['title'] }}
+              </div>
+              <div class="ed-update-msg">{{ u['message'] }}</div>
+              <div class="ed-update-time">
+                {{ u.get('created_at') or '' }}
+              </div>
+            </div>
+            {% else %}
+            <div class="ed-empty-updates">
+              <div class="ed-empty-updates-icon">💬</div>
+              <div class="ed-empty-updates-title">No updates yet</div>
+              <div class="ed-empty-updates-sub">Check back later for announcements.</div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Card: Quick Summary -->
+        <div class="ed-card">
+          <div class="ed-card-header">
+            <div class="ed-card-icon green">⚡</div>
+            <div>
+              <h2 class="ed-card-title">Quick Facts</h2>
+              <div class="ed-card-subtitle">Key logistical points.</div>
+            </div>
+          </div>
+
+          <div class="ed-fact-item">
+            <span class="ed-fact-label">Registration</span>
+            <span class="ed-fact-val">
+              {% if registered %}
+                <span style="color:var(--hive-green-500);font-weight:700">Enrolled</span>
+              {% else %}
+                <span>Open</span>
+              {% endif %}
+            </span>
+          </div>
+          <div class="ed-fact-item">
+            <span class="ed-fact-label">Enrolled Seats</span>
+            <span class="ed-fact-val">{{ count }} / {{ event['capacity'] or '&infin;' }}</span>
+          </div>
+          <div class="ed-fact-item">
+            <span class="ed-fact-label">Category</span>
+            <span class="ed-fact-val">{{ event.get('program_name') or 'Innovation' }}</span>
+          </div>
+          <div class="ed-fact-item">
+            <span class="ed-fact-label">Institution</span>
+            <span class="ed-fact-val">SRIT HIVE</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+</div>
+{% endblock %}

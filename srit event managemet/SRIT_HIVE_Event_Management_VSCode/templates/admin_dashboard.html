@@ -1,0 +1,134 @@
+﻿{% extends "base.html" %}
+{% block title %}Admin Dashboard | SRIT HIVE{% endblock %}
+
+{% block content %}
+<div class="section-head">
+  <div>
+    <h2>SRIT HIVE &bull; Administration Console</h2>
+    <div class="section-sub">Institutional analytics, platform registrations and event governance.</div>
+  </div>
+  <div style="display:flex; gap: 8px;">
+    <a class="btn btn-secondary" href="{{ url_for('events') }}">View Events</a>
+    <a class="btn btn-primary" href="{{ url_for('create_event') }}">+ Create Event</a>
+  </div>
+</div>
+
+<!-- KPI Stats -->
+<div class="stats" style="grid-template-columns: repeat(5, 1fr);">
+  <div class="stat">
+    <div style="font-size:1.6rem;">👥</div>
+    <div>
+      <div class="number">{{ stats.users }}</div>
+      <div class="label">Total Users</div>
+    </div>
+  </div>
+  <div class="stat">
+    <div style="font-size:1.6rem;">📅</div>
+    <div>
+      <div class="number">{{ stats.events }}</div>
+      <div class="label">Total Events</div>
+    </div>
+  </div>
+  <div class="stat">
+    <div style="font-size:1.6rem;">📋</div>
+    <div>
+      <div class="number">{{ stats.registrations }}</div>
+      <div class="label">Registrations</div>
+    </div>
+  </div>
+  <div class="stat">
+    <div style="font-size:1.6rem;">💬</div>
+    <div>
+      <div class="number">{{ stats.feedback }}</div>
+      <div class="label">Feedback</div>
+    </div>
+  </div>
+  <div class="stat">
+    <div style="font-size:1.6rem;">🎓</div>
+    <div>
+      <div class="number">{{ stats.certificates }}</div>
+      <div class="label">Certificates</div>
+    </div>
+  </div>
+</div>
+
+<!-- 2-Col Data Tables -->
+<div class="two-col">
+  <div class="card" style="padding: 20px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 14px;">
+      <h3 style="color:var(--hive-text-title); margin:0;">Recent Users</h3>
+      <span class="badge teal">{{ users|length }} Active</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Email</th>
+            <th>Joined</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td>
+              <div style="font-weight:700; color:var(--hive-text-title);">{{ u['name'] }}</div>
+              <div class="small">{{ u['department'] }}</div>
+            </td>
+            <td>
+              {% if u['role'] == 'admin' %}<span class="badge red">Admin</span>
+              {% elif u['role'] == 'faculty' %}<span class="badge teal">Faculty</span>
+              {% else %}<span class="badge gold">Student</span>{% endif %}
+            </td>
+            <td style="font-size:0.8rem; color:var(--hive-text-muted);">{{ u['email'] }}</td>
+            <td style="font-size:0.8rem; color:var(--hive-text-muted); white-space:nowrap;">{{ u['created_at'] }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" class="empty">No users found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="padding: 20px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 14px;">
+      <h3 style="color:var(--hive-text-title); margin:0;">Recent Events</h3>
+      <span class="badge gold">{{ events|length }} Events</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Event</th>
+            <th>Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in events %}
+          <tr>
+            <td>
+              <a href="{{ url_for('event_detail', event_id=e['id']) }}" style="font-weight:700; color:var(--hive-text-title);">
+                {{ e['title'] }}
+              </a>
+              <div class="small">{{ e['venue'] }}</div>
+            </td>
+            <td style="font-size:0.8rem; color:var(--hive-text-muted); white-space:nowrap;">{{ e['event_date'] }}</td>
+            <td>
+              {% set st = (e.get('status') or 'Upcoming')|lower %}
+              {% if st == 'completed' %}<span class="badge green">Completed</span>
+              {% elif st == 'upcoming' %}<span class="badge gold">Upcoming</span>
+              {% else %}<span class="badge teal">{{ e.get('status') or 'Open' }}</span>{% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3" class="empty">No events found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

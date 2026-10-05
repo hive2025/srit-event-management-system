@@ -1,0 +1,15 @@
+﻿{% extends "base.html" %}
+{% block title %}500 Internal Error | SRIT HIVE{% endblock %}
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 60px auto; text-align: center; padding: 48px 32px;">
+  <span class="badge red" style="font-size: 0.85rem; padding: 6px 16px;">Error 500</span>
+  <h1 style="color: var(--hive-text-title); margin: 18px 0 10px; font-size: 2rem;">Internal Server Error</h1>
+  <p style="color: var(--hive-text-muted); line-height: 1.6; margin-bottom: 28px;">
+    Something unexpected occurred. Our team has been notified. Please try again in a few moments.
+  </p>
+  <div style="display:flex; justify-content:center; gap: 12px; flex-wrap:wrap;">
+    <a class="btn btn-dark" href="{{ url_for('index') }}">Go to Homepage</a>
+    <a class="btn btn-secondary" href="{{ url_for('events') }}">Explore Events</a>
+  </div>
+</div>
+{% endblock %}
