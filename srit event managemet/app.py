@@ -283,40 +283,62 @@ def log_firebase_auth_startup_diagnostics():
     )
 
 
+
 def get_firestore_client():
     """Initialize and return the Firestore client."""
-    global _firestore_client, _firestore_connection_message, FIREBASE_ADMIN_INITIALIZED
+    global _firestore_client
+    global _firestore_connection_message
+    global FIREBASE_ADMIN_INITIALIZED
+
     if _firestore_client is not None:
         return _firestore_client
-    credential_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
-    if not credential_path:
-        _firestore_connection_message = (
-            "Firestore is not configured. Set GOOGLE_APPLICATION_CREDENTIALS "
-            "to your Firebase service-account JSON file."
-        )
-        return None
-    if not os.path.isfile(credential_path):
-        _firestore_connection_message = "Firestore credential file was not found."
-        return None
+
+    credential_json = os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON", "").strip()
+    credential_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "").strip()
+
     try:
         try:
             firebase_app = firebase_admin.get_app()
             FIREBASE_ADMIN_INITIALIZED = True
         except ValueError:
-            try:
-                from firebase_admin import credentials as fb_credentials
+            from firebase_admin import credentials as fb_credentials
+
+            if credential_json:
+                # Railway: load credentials from an environment variable
+                service_account_info = json.loads(credential_json)
+                cred = fb_credentials.Certificate(service_account_info)
+                firebase_app = firebase_admin.initialize_app(cred)
+
+            elif credential_path and os.path.isfile(credential_path):
+                # Local development or a host with a mounted credential file
                 cred = fb_credentials.Certificate(credential_path)
                 firebase_app = firebase_admin.initialize_app(cred)
-            except Exception:
-                firebase_app = firebase_admin.initialize_app()
+
+            else:
+                _firestore_connection_message = (
+                    "Firestore is not configured. Set "
+                    "FIREBASE_SERVICE_ACCOUNT_JSON or provide a valid "
+                    "GOOGLE_APPLICATION_CREDENTIALS file path."
+                )
+                FIREBASE_ADMIN_INITIALIZED = False
+                return None
+
             FIREBASE_ADMIN_INITIALIZED = True
+
         _firestore_client = firestore.client(firebase_app)
+
     except Exception:
-        _firestore_connection_message = "Firestore initialization failed. Check the configured credentials."
+        app.logger.exception("Firebase Firestore initialization failed.")
+        _firestore_connection_message = (
+            "Firestore initialization failed. Check the Firebase credentials "
+            "and project configuration."
+        )
         FIREBASE_ADMIN_INITIALIZED = False
         return None
+
     _firestore_connection_message = "Firestore client initialized."
     return _firestore_client
+
 
 
 def firestore_collection(name):
